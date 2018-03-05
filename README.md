@@ -137,15 +137,14 @@ the [`pigpiod`](http://abyz.me.uk/rpi/pigpio/pigpiod.html) package by Joan, maki
 
 First clone this repo (or rsync it over) so that there is
 the directory `/home/pi/web/Opabinia/` on the RPi.
-Make sure `measurer.py` and `wsgi_run.py` are given execute
-permission (CHECK), the former in particular for all users.
+Make sure `app/measurer.py` and `wsgi_run.py` are given execute
+permission, the former in particular for all users.
 
 To set up the web app so that nginx acts as a reverse proxy to it: copy the
 site file `Doc/nginx/site-opabinia` into `/etc/nginx/sites-available`,
 __remembering to adapt its `server_name` line to the RPi's network configuration__, and
-make a symlink thereto in `/etc/nginx/sites-enabled`; also replace (CHECK)
-the provided `/etc/nginx/nginx.conf` with the one found
-in `Doc/nginx/nginx.conf`. Finally, delete (CHECK) the `default` file found
+make a symlink thereto in `/etc/nginx/sites-enabled`.
+Finally, delete the `default` file found
 in `etc/nginx/sites-enabled`.
 
 _Now this would be a good moment to solder and/or wire up the circuitry as

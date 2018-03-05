@@ -12,9 +12,9 @@ class DistanceSensor:
       self.echo=echo
       self.pi=pi
       #
-      self._high=None
-      self._time=None
-      self._done=None
+      self._high=self.pi.get_current_tick() 
+      self._time=self.pi.get_current_tick() 
+      self._done=self.pi.get_current_tick() 
       #
       self.pi.callback(self.echo,pigpio.RISING_EDGE,self.onRising)
       self.pi.callback(self.echo,pigpio.FALLING_EDGE,self.onFalling)

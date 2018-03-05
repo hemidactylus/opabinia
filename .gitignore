@@ -1,2 +1,2 @@
 *.pyc
-webApp/app/database/webapp.db
+app/database/*.db
