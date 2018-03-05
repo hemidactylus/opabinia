@@ -7,7 +7,7 @@ from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-dbName = os.path.join(basedir,'database','webapp.db')
+dbName = os.path.join(basedir,'database','opabinia.db')
 
 timeZone='Europe/Rome'
 

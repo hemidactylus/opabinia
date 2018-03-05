@@ -45,7 +45,7 @@ for it and the magic of `DHCP` works).
 
 Additionally, provided the Avahi daemon on the RPi plays nice with the local network,
 the app becomes available not only as `http://IP_ADDRESS/`, but also at the address
-[`http://pimpa.local/`](http://pimpa.local). _Disclaimer_: for reasons still unclear to
+[`http://pimpa.local/`](http://pimpa.local). _Disclaimer_ : for reasons still unclear to
 me, this sometimes works and sometimes doesn't, in a rather whimsical way. In the
 worst case one can issue a portscan command and figure out the local IP address
 of the RPi, whose ssh port 22 is open: that is, with the proper CIDR range for the
@@ -64,6 +64,7 @@ is enough (here it is assumed that Raspbian Stretch Lite is used, which
 uses systemd; for older builds, based on systemv, see the note below). Once in possession
 of the image, for instance `2017-11-29-raspbian-stretch-lite.img`, burn it from the
 PC (without messing up the destination device name, please):
+
     sudo dd bs=4M if=2017-11-29-raspbian-stretch-lite.img of=/dev/mmcblk0  status=progress conv=fsync
 
 To enable ssh access right from the start, create a file called `ssh` (no extension)
@@ -153,8 +154,10 @@ This should be made with the RPi powered off._
 
 To set up both the Flask app and the measurer as system services,
 the following two files must be copied into `/etc/systemd/system/`:
-    - `/Doc/systemd/opawebapp.service`
-    - `/Doc/systemd/opacounter.service`
+
+    /Doc/systemd/opawebapp.service
+    /Doc/systemd/opacounter.service
+
 To start the services:
 
     sudo systemctl start opawebapp
@@ -168,17 +171,19 @@ and finally to make them start at each reboot:
 _Note_: these instructions for the system services assume systemd is the init daemon:
 in other cases, similar instructions apply, see the note below for Wheezy.
 
-__Sensor configuration__: in most cases, the only setting that might require
-some tuning is the range of distances triggering a positive detection: those are
-set (in meters) by changing the two-element array `sensorDistanceRange`
+__Sensor configuration__: in most cases, the only settings that might require
+some tuning are the `timeZone` in `config.py`
+(refer to [`pytz`](https://pypi.python.org/pypi/pytz) for details on this)
+and the range of distances triggering a positive detection:
+the latter are set (in meters) by changing the two-element array `sensorDistanceRange`
 in file `app/config.py` (after which `opacounter` shall be restarted).
 
 ### Notes and Caveats
 
 __DB access__: if the FIRST task to run, which created the DB, is the measurer `opacounter`,
 the database file is owned by `root`, which is a problem.
-Make sure it is `pi:www-data`, either through chown or simply by first starting the web app
-`opawebapp` after a delete.
+Make sure it is `pi:www-data`, either through `chown` or simply by first starting the web app
+`opawebapp` after deleting `Opabinia/app/database/opabinia.db`.
 
 ### In case of Wheezy Raspbian
 
