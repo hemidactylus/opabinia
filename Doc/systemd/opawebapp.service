@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve the Opabinia Webapp
+After=network.target
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/home/pi/web/webApp/
+ExecStart=/usr/local/bin/uwsgi --ini webapp.ini
+
+[Install]
+WantedBy=multi-user.target
+

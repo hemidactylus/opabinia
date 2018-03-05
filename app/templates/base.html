@@ -1,0 +1,89 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+
+{% block head %}
+
+    {{super()}}
+    {{fixes.ie8()}}
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="stylesheet" href="/static/ubq/font-awesome/css/font-awesome.min.css" type="text/css"> -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- <link href="/static/ubq/css/ubq2.css" rel="stylesheet" type="text/css" /> -->
+    <link rel="icon" href="/static/images/icon.png">
+
+{% endblock %}
+
+{% block title %}
+    {% if pagetitle %}
+        {{ pagetitle }} - Opabinia
+    {% else %}
+        Opabinia
+    {% endif %}
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active">
+                <a href="{{ url_for('ep_index',mode=timespan) }}">
+                  <img class=".img-responsive" src="/static/images/icon.png" alt="Logo" height=25px>
+                  Opabinia
+                </a>
+              </li>
+              <li>
+                {% if timespan %}
+                  <a href="{{ url_for('ep_events',mode=timespan) }}">
+                {% else %}
+                  <a href="{{ url_for('ep_events') }}">
+                {% endif %}
+                  Events
+                </a>
+              </li>
+              <li>
+                <a href="{{ url_for('ep_about') }}">
+                  <!-- <i class="fa fa-server fa-lg" aria-hidden="true"></i> -->
+                  About
+                </a>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+</div>
+{% endblock %}
+
+{% block content %}
+  {{util.flashed_messages(dismissible=True)}}
+{% endblock %}
+
+{% block footer %}
+<nav class="navbar navbar-default navbar-fixed-bottom footer-colors">
+  <div class="container" align="center">
+      <small>
+        <img src="/static/images/icon.png" alt="Logo" height=20px>
+        Opabinia:
+        <a href="{{ url_for('ep_about') }}">about</a>
+        <!-- - -->
+        <!-- <a href="https://github.com/hemidactylus/ubq2" target="_blank">github</a> -->
+      </small>
+  </div>
+</nav>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="container">
+      <div class="row">
+        <div class="row">
+          <div class="col-md-12">
+            <h2> {{ pagetitle }} </h2>
+          </div>
+          <div class="col-md-12">
+              <a href="{{ url_for('ep_index') }}">
+                <img src="/static/images/opabinia.png" width="40%">
+              </a>
+          </div>
+          <div class="col-md-12" style="border-top: 20px;">
+            <p>
+                Opabinia: a people-counter project made with Raspberry Pi, Python and pigpio.
+            </p>
+            <p>
+              <img src="/static/images/salamandrina.svg" width="30px">
+              A <a href="https://salamandrina.net">salamandrina.net</a> product.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% block footer %}
+        {{ super() }}
+    {% endblock %}
+
+{% endblock %}
+

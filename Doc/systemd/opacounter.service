@@ -1,0 +1,13 @@
+[Unit]
+Description=Opabinia Sensor Engine
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/home/pi/web/webApp/
+ExecStart=/home/pi/web/webApp/app/measurer.py
+
+[Install]
+WantedBy=multi-user.target
+
