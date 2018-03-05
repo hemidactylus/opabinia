@@ -5,7 +5,7 @@ made with a Raspberry Pi, a proximity sensor, some software and lots of love.
 
 ## Overview
 
-<img src="app/static/images/opabinia.png" alt="Logo" style="width: 40%;"/>
+<img src="app/static/images/opabinia.png" alt="Logo" width="40%"/>
 
 Proximity sensors (HC-SR04), attached to a Raspberry Pi, track the passage of people in front of it;
 software running on the RPi keeps the counts and offers, in the local network, a simple Web interface
@@ -30,7 +30,7 @@ Opabinia is made with the following hardware (CHECK DETAILS):
 
 The schematics are as follows (CHECK TO DO):
 
-<img src="app/static/images/opabinia.png" alt="Logo" style="width: 40%;"/>
+<img src="app/static/images/opabinia.png" alt="Logo"  width="25%"/>
 
 ### Software components
 
@@ -148,9 +148,8 @@ the provided `/etc/nginx/nginx.conf` with the one found
 in `Doc/nginx/nginx.conf`. Finally, delete (CHECK) the `default` file found
 in `etc/nginx/sites-enabled`.
 
-_Now this would be a good moment to wire up the circuitry as
-shown in the schematics above.
-This should be made with the RPi powered off._
+_Now this would be a good moment to solder and/or wire up the circuitry as
+shown in the schematics above. This should be made with the RPi powered off._
 
 To set up both the Flask app and the measurer as system services,
 the following two files must be copied into `/etc/systemd/system/`:
@@ -178,12 +177,12 @@ and the range of distances triggering a positive detection:
 the latter are set (in meters) by changing the two-element array `sensorDistanceRange`
 in file `app/config.py` (after which `opacounter` shall be restarted).
 
-### Notes and Caveats
+### Database file ownership
 
-__DB access__: if the FIRST task to run, which created the DB, is the measurer `opacounter`,
+If the FIRST task to run, which created the DB, is the measurer `opacounter`,
 the database file is owned by `root`, which is a problem.
 Make sure it is `pi:www-data`, either through `chown` or simply by first starting the web app
-`opawebapp` after deleting `Opabinia/app/database/opabinia.db`.
+`opawebapp` right after deleting `Opabinia/app/database/opabinia.db`.
 
 ### In case of Wheezy Raspbian
 
@@ -196,3 +195,5 @@ Sample scripts, replacing the systemd ones, are provided in the `Doc/systemV` di
 [Setting up a python Flask web-app on a RPi with uWSGI and Python](https://iotbytes.wordpress.com/python-flask-web-application-on-raspberry-pi-with-nginx-and-uwsgi/)
 
 [SystemV init scripts](https://blog.frd.mn/how-to-set-up-proper-startstop-services-ubuntu-debian-mac-windows/)
+
+(the other) [Opabinia](http://www.prehistoric-wildlife.com/species/o/opabinia.html)
