@@ -84,7 +84,7 @@ def ep_index(mode="default"):
                 now
             )
         ),
-        key=lambda lRow: lRow['time'],
+        key=lambda lRow: lRow['time'] if lRow['time'] is not None else localiseDate(datetime(1900,1,1)),
         reverse=True,
     )[:maxRecentItems]
     #

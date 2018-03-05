@@ -176,13 +176,6 @@ and the range of distances triggering a positive detection:
 the latter are set (in meters) by changing the two-element array `sensorDistanceRange`
 in file `app/config.py` (after which `opacounter` shall be restarted).
 
-### Database file ownership
-
-If the FIRST task to run, which created the DB, is the measurer `opacounter`,
-the database file is owned by `root`, which is a problem.
-Make sure it is `pi:www-data`, either through `chown` or simply by first starting the web app
-`opawebapp` right after deleting `Opabinia/app/database/opabinia.db`.
-
 ### In case of Wheezy Raspbian
 
 On older Raspbian builds (i.e. Wheezy), the systemd part is replaced by systemV scripts.

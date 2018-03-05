@@ -4,6 +4,7 @@
 
 import sqlite3 as lite
 import os
+import stat
 from operator import itemgetter
 from datetime import datetime
 
@@ -195,6 +196,13 @@ def dbDeleteRecordsByKey(db, tableName, key):
 
 ## SPECIALIZATIONS
 
+def setRWAttributeForAll(filename):
+    '''
+        Set rw-rw-rw attribute to database file
+    '''
+    attrConstant=stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
+    os.chmod(filename, attrConstant )
+
 def checkAndOpenDatabase(dbName):
     if not os.path.isfile(dbName):
         print('[checkAndOpenDatabase] Going to create DB "%s"!' % dbName)
@@ -206,6 +214,7 @@ def checkAndOpenDatabase(dbName):
                 pass
             retVal=dbCreateTable(db, tName, tContents)
         db.commit()
+        setRWAttributeForAll(dbName)
         print('Done.')
     return dbOpenDatabase(dbName)
 
@@ -218,7 +227,7 @@ def dbSaveRow(db, record):
     finalRecord['time']=datetime.utcnow()
     dbAddRecordToTable(db,'counts',finalRecord)
 
-def integrateRows(db, zeroDate=None, startDate=None, endDate=None, initValues={'count':0,'abscount':0}):
+def integrateRows(db, zeroDate=None, startDate=None, endDate=None):
     '''
         zeroDate is the left extreme of integration
         startDate is the first date to track in making the explicit list
@@ -227,25 +236,35 @@ def integrateRows(db, zeroDate=None, startDate=None, endDate=None, initValues={'
         Returned is an array of integrated values
         for all recorded ticks between startDate and endDate
     '''
-    summedKeys={'count','abscount'}
+    #
     whereClause=prepareWhereClause('time',zeroDate,endDate)
     #
-    ini=initValues
-    ini['time']=None
-    results=[]
+    summedKeys={'count','abscount'}
+    ini={k:0 for k in summedKeys}
+    #
     rowCursor=dbRetrieveAllRecords(db,'counts',whereClause=whereClause)
     # traceless part (all the way to startDate)
+    lastFound=None
     for doc in rowCursor:
         if doc['time']>=startDate:
+            lastFound=doc
             break
-        #
+        else:
+            ini={
+                k: ini[k]+doc[k]
+                for k in summedKeys
+            }
+    #
+    ini['time']=startDate
+    results=[ini]
+    if lastFound is not None:
         ini={
-            k: ini.get(k,0)+doc.get(k,0)
+            k: ini[k]+lastFound[k]
             for k in summedKeys
         }
-        ini['time']=doc['time']
+        ini['time']=lastFound['time']
+        results.append(ini)
     # we have come to the traceful part
-    results=[ini]
     for doc in rowCursor:
         ini={
             k: ini.get(k,0)+doc.get(k,0)
