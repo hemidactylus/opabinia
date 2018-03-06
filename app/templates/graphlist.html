@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12" style="text-align: center;">
+          <h2> {{ pagetitle }} </h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12" style="text-align: center; margin-bottom: 12px;">
+            <a href="{{ url_for('ep_counters') }}">
+              <img src="/static/images/opabinia.png" width="10%">
+            </a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-offset-4 col-md-4 col-sm-12">
+          <div class="row">
+            <div class="col-md-4 col-sm-4">
+              <a href="{{ baseurl }}/4"
+                 class="btn btn-sm btn-primary {%- if timespan=='4' -%} active {%- endif -%}" style="width: 100%;">
+                Today
+              </a>
+            </div>
+            <div class="col-md-4 col-sm-4">
+              <a href="{{ baseurl }}/8"
+                 class="btn btn-sm btn-primary {%- if timespan=='8' -%} active {%- endif -%}" style="width: 100%;">
+                Yesterday
+              </a>
+            </div>
+            <div class="col-md-4 col-sm-4">
+              <a href="{{ baseurl }}/fullday"
+                 class="btn btn-sm btn-primary {%- if timespan=='fullday' -%} active {%- endif -%}" style="width: 100%;">
+                Choose ...
+              </a>
+            </div>
+          </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" style="text-align: center; margin-top: 20px;">
+          {{ text }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8 col-sm-6">
+          <p>
+              (here the plot should be)
+          </p>
+          <p>
+            <img src="/static/images/opabinia.png" width="80%">
+          </p>
+        </div>
+        <div class="col-md-4 col-sm-6" style="margin-bottom: 80px;">
+          <div style="overflow: auto; height: 400px;">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th class="col col-sm-6">
+                    Time
+                  </th>
+                  {% if pointlike %}
+                    <th class="col col-sm-6">
+                      Event
+                    </th>
+                  {% else %}
+                     <th class="col col-sm-3">
+                      Passages
+                    </th>
+                    <th class="col col-sm-3">
+                      Room Contents
+                    </th>
+                 {% endif %}
+                </tr>
+              </thead>
+              <tbody>
+              {% for ent in entries %}
+                <tr>
+                  <td>
+                    {% if ent.time %}
+                      {{ ent.time.strftime('%H:%M:%S') }}
+                    {% else %}
+                      ---
+                    {% endif %}
+                  </td>
+                  {% if not pointlike %}
+                    <td>
+                      {{ ent.abscount }}
+                    </td>
+                 {% endif %}
+                  <td>
+                    {% if ent.count < 0 %}
+                      <span style="color: red; font-weight: bold;">
+                    {% endif %}
+                      {{ "%+i" % ent.count }}
+                    {% if ent.count < 0 %}
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% block footer %}
+        {{ super() }}
+    {% endblock %}
+
+{% endblock %}
+

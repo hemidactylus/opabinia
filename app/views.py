@@ -77,9 +77,11 @@ def timeBounds(mode):
     return now,lastMidnight,backTime,nHours
 
 @app.route('/')
+@app.route('/counters')
+@app.route('/counters/<mode>')
 @app.route('/index')
 @app.route('/index/<mode>')
-def ep_index(mode="default"):
+def ep_counters(mode='default'):
     db=dbOpenDatabase(dbName)
     #
     now,lastMidnight,backTime,nH=timeBounds(mode)
@@ -100,10 +102,10 @@ def ep_index(mode="default"):
     #
     hDesc='full day' if nH is None else 'last %s hours' % nH
     return render_template(
-      "eventlist.html",
+      "graphlist.html",
       text='Recent items (%s): %i' % (hDesc,len(entries)),
-      pagetitle='Home',
-      baseurl=url_for('ep_index'),
+      pagetitle='Counts for %s' % (datetime.now().strftime('%B %d, %Y')),
+      baseurl=url_for('ep_counters'),
       pointlike=False, # three-col layout
       timespan=mode,
       entries=entries,
@@ -132,9 +134,9 @@ def ep_events(mode='default'):
     #
     hDesc='full day' if nH is None else 'last %s hours' % nH
     return render_template(
-      "eventlist.html",
+      "graphlist.html",
       text='Recent items (%s): %i' % (hDesc,len(entries)),
-      pagetitle='Events',
+      pagetitle='Events for %s' % (datetime.now().strftime('%B %d, %Y')),
       baseurl=url_for('ep_events'),
       pointlike=True, # this means: pointlike events, two-column layout
       timespan=mode,
@@ -145,5 +147,5 @@ def ep_events(mode='default'):
 def ep_about():
     return render_template(
         'about.html',
-        pagetitle='About',
+        pagetitle='About Opabinia',
     )
