@@ -61,19 +61,22 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th class="col col-sm-6">
-                    Time
-                  </th>
                   {% if pointlike %}
                     <th class="col col-sm-6">
-                      Event
+                      Time
+                    </th>
+                    <th class="col col-sm-6">
+                      Hit
                     </th>
                   {% else %}
-                     <th class="col col-sm-3">
-                      Passages
+                    <th class="col col-sm-4">
+                      Time
                     </th>
-                    <th class="col col-sm-3">
-                      Room Contents
+                     <th class="col col-sm-4">
+                      Total Hits
+                    </th>
+                    <th class="col col-sm-4">
+                      People In
                     </th>
                  {% endif %}
                 </tr>

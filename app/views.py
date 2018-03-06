@@ -31,6 +31,7 @@ from app.dboperations import (
     dbGetRows,
     dbSaveRow,
     integrateRows,
+    dbGetDateList,
 )
 
 def findPreviousMidnight(naiveDT):
@@ -148,4 +149,12 @@ def ep_about():
     return render_template(
         'about.html',
         pagetitle='About Opabinia',
+    )
+
+@app.route('/chooseday')
+def ep_chooseday():
+    db=dbOpenDatabase(dbName)
+    return '\n'.join(
+        str(d)
+        for d in dbGetDateList(db)
     )

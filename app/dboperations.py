@@ -98,6 +98,12 @@ def integrateRows(db, zeroDate=None, startDate=None, endDate=None):
         results.append(ini)
     return results
 
+def dbGetDateList(db):
+    return sorted(
+        tp[0]
+        for tp in db.cursor().execute('SELECT DISTINCT(date) FROM counts;')
+    )
+
 if __name__=='__main__':
     from config import dbName
     from datetime import datetime
