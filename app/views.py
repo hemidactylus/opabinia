@@ -33,6 +33,19 @@ from dbtools import (
     integrateRows,
 )
 
+def findPreviousMidnight(naiveDT):
+    '''
+        given a naive date, returns the utc date
+        of the most recent midnight (for that timezone,
+        but recast as utc)
+
+        Somehow this seems to work, but damn timezones!
+    '''
+    locMidnight = pytz \
+        .timezone(timeZone) \
+        .localize(datetime(*localiseDate(naiveDT).timetuple()[:3]))
+    return datetime(*locMidnight.utctimetuple()[:5])
+
 def localiseDate(dt):
     locDate=pytz.utc.localize(dt,is_dst=None)
     return locDate.astimezone(pytz.timezone(timeZone))
@@ -43,12 +56,12 @@ def localiseRow(row):
         nrow['time']=localiseDate(row['time'])
     return nrow
 
-# check at start
-db=checkAndOpenDatabase(dbName)
+def checkDB(dbfilename):
+    checkAndOpenDatabase(dbName)
 
 def timeBounds(mode):
     now=datetime.utcnow()
-    lastMidnight=datetime(*datetime.now().timetuple()[:3])
+    lastMidnight=findPreviousMidnight(now)
     if mode=='default':
         nHours=defaultHoursBack
         backTime=now-recentnessTimeSpan

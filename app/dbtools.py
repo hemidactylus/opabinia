@@ -237,6 +237,7 @@ def integrateRows(db, zeroDate=None, startDate=None, endDate=None):
         for all recorded ticks between startDate and endDate
     '''
     #
+    print(startDate)
     whereClause=prepareWhereClause('time',zeroDate,endDate)
     #
     summedKeys={'count','abscount'}

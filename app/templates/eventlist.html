@@ -93,7 +93,13 @@
                     </td>
                  {% endif %}
                   <td>
-                    {{ "%+i" % ent.count }}
+                    {% if ent.count < 0 %}
+                      <span style="color: red; font-weight: bold;">
+                    {% endif %}
+                      {{ "%+i" % ent.count }}
+                    {% if ent.count < 0 %}
+                      </span>
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
