@@ -1,8 +1,12 @@
 from app import app as application
 
-from app.views import checkDB
-from app.config import dbName
+from app.dboperations import (
+    checkAndOpenDatabase,
+)
+from app.config import (
+    dbName
+)
 
 if __name__=='__main__':
-    checkDB(dbName)
+    checkAndOpenDatabase(dbName)
     application.run()

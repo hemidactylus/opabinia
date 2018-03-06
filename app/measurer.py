@@ -29,7 +29,7 @@ from config import (
     debStatusLed,
     baseStatusLed,
 )
-from dbtools import (
+from dboperations import (
     checkAndOpenDatabase,
     dbOpenDatabase,
     dbSaveRow,

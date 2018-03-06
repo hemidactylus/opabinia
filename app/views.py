@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 from app import app
 
-from config import (
+from app.config import (
     dbName,
     timeZone,
     recentnessTimeSpan,
@@ -25,7 +25,7 @@ from config import (
     defaultHoursBack,
 )
 
-from dbtools import (
+from app.dboperations import (
     checkAndOpenDatabase,
     dbOpenDatabase,
     dbGetRows,
@@ -55,9 +55,6 @@ def localiseRow(row):
     if nrow['time'] is not None:
         nrow['time']=localiseDate(row['time'])
     return nrow
-
-def checkDB(dbfilename):
-    checkAndOpenDatabase(dbName)
 
 def timeBounds(mode):
     now=datetime.utcnow()

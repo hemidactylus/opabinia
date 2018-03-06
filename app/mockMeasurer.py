@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 '''
     Generation of mock passage data for testing
@@ -9,7 +9,7 @@ from time import sleep
 from random import random
 import sys
 
-from dbtools import (
+from dboperations import (
     checkAndOpenDatabase,
     dbOpenDatabase,
     dbSaveRow,

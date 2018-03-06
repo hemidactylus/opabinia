@@ -2,13 +2,14 @@
 
 import sys
 
+# failsafe db creation
+from app.config import dbName
+from app.dboperations import checkAndOpenDatabase
+checkAndOpenDatabase(dbName)
+
 from app import app
 
-from app.views import checkDB
-from app.config import dbName
-
 if __name__=='__main__':
-    checkDB(dbName)
     # if -e flag is specified, enable running as
     # externally-accessible (still non-production) host
     host=None

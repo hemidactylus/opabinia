@@ -2,11 +2,8 @@ import os
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
-from config import dbName
+from app.config import dbName
 
-from dbtools import (
-    checkAndOpenDatabase,
-)
 app = Flask(__name__,static_folder='static', static_url_path='/static')
 Bootstrap(app)
 
