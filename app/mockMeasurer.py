@@ -18,8 +18,8 @@ from config import (
     dbName
 )
 
-minTime=5
-maxTime=10
+minTime=12
+maxTime=36
 
 if __name__=='__main__':
 

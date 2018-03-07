@@ -9,30 +9,26 @@
           <h2> {{ pagetitle }} </h2>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12" style="text-align: center; margin-bottom: 12px;">
-            <a href="{{ url_for('ep_counters') }}">
-              <img src="/static/images/opabinia.png" width="10%">
-            </a>
-        </div>
-      </div>
 
       <div class="row">
         <div class="col-md-offset-4 col-md-4 col-sm-12">
           <div class="row">
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/4"
                  class="btn btn-sm btn-primary {%- if timespan=='4' -%} active {%- endif -%}" style="width: 100%;">
                 Today
               </a>
             </div>
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/8"
                  class="btn btn-sm btn-primary {%- if timespan=='8' -%} active {%- endif -%}" style="width: 100%;">
                 Yesterday
               </a>
             </div>
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-3 col-sm-3" style="text-align: center; margin-bottom: 12px;">
+                <img src="/static/images/opabinia.png" height="35px">
+            </div>
+            <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/fullday"
                  class="btn btn-sm btn-primary {%- if timespan=='fullday' -%} active {%- endif -%}" style="width: 100%;">
                 Choose ...
