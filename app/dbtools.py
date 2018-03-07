@@ -125,7 +125,7 @@ def prepareWhereClause(fieldName,startDate=None,endDate=None):
     if endDate is not None:
         whereClauses.append('%s <= \'%s\'' % (fieldName,endDate.strftime(sqlDateFormat)))
     if len(whereClauses):
-        whereClause='WHERE %s ' % ' AND '.join(whereClauses)
+        whereClause=' %s ' % ' AND '.join(whereClauses)
     else:
         whereClause=' '
     return whereClause
@@ -137,7 +137,7 @@ def dbRetrieveAllRecords(db, tableName, whereClause=None):
         in no particular order AT THE MOMENT
     '''
     cur=db.cursor()
-    selectStatement='SELECT * FROM %s%s' % (tableName,'' if whereClause is None else ' %s' % whereClause)
+    selectStatement='SELECT * FROM %s%s' % (tableName,'' if whereClause is None else ' WHERE %s' % whereClause)
     if DB_DEBUG:
         print('[dbRetrieveAllRecords] %s' % selectStatement)
     cur.execute(selectStatement)

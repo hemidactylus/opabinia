@@ -20,9 +20,8 @@ from app import app
 from app.config import (
     dbName,
     timeZone,
-    recentnessTimeSpan,
-    maxRecentItems,
-    defaultHoursBack,
+    dateFormat,
+    niceDateFormat,
 )
 
 from app.dboperations import (
@@ -34,89 +33,45 @@ from app.dboperations import (
     dbGetDateList,
 )
 
-def findPreviousMidnight(naiveDT):
-    '''
-        given a naive date, returns the utc date
-        of the most recent midnight (for that timezone,
-        but recast as utc)
-
-        Somehow this seems to work, but damn timezones!
-    '''
-    locMidnight = pytz \
-        .timezone(timeZone) \
-        .localize(datetime(*localiseDate(naiveDT).timetuple()[:3]))
-    return datetime(*locMidnight.utctimetuple()[:5])
-
-def localiseDate(dt):
-    locDate=pytz.utc.localize(dt,is_dst=None)
-    return locDate.astimezone(pytz.timezone(timeZone))
-
-def localiseRow(row):
-    nrow=row
-    if nrow['time'] is not None:
-        nrow['time']=localiseDate(row['time'])
-    return nrow
-
-def timeBounds(mode):
-    now=datetime.utcnow()
-    lastMidnight=findPreviousMidnight(now)
-    if mode=='default':
-        nHours=defaultHoursBack
-        backTime=now-recentnessTimeSpan
-    elif mode=='fullday':
-        nHours=None
-        backTime=lastMidnight
-    else:
-        try:
-            nHours=abs(float(mode))
-            if int(nHours)==nHours:
-                nHours=int(nHours)
-            backTime=now-timedelta(hours=nHours)
-        except:
-            nHours=defaultHoursBack
-            backTime=now-recentnessTimeSpan
-    return now,lastMidnight,backTime,nHours
+from dateutils import (
+    findPreviousMidnight,
+    localiseDate,
+    localiseRow,
+    timeBounds,
+)
 
 @app.route('/')
 @app.route('/counters')
-@app.route('/counters/<mode>')
-@app.route('/index')
-@app.route('/index/<mode>')
-def ep_counters(mode='default'):
+@app.route('/counters/<date>')
+def ep_counters(date='default'):
     db=dbOpenDatabase(dbName)
-    #
-    now,lastMidnight,backTime,nH=timeBounds(mode)
-    #
+    reqDate,lastMidnight=timeBounds(date)
     entries=sorted(
-        (
+        [
             localiseRow(row)
             for row in integrateRows(
                 db,
-                lastMidnight,
-                backTime,
-                now
+                reqDate,
             )
-        ),
-        key=lambda lRow: lRow['time'] if lRow['time'] is not None else localiseDate(datetime(1900,1,1)),
+        ],
+        key=lambda evt: evt['time'],
         reverse=True,
-    )[:maxRecentItems]
-    #
-    hDesc='full day' if nH is None else 'last %s hours' % nH
+    )
     return render_template(
       "graphlist.html",
-      text='Recent items (%s): %i' % (hDesc,len(entries)),
-      pagetitle='Counts for %s' % (datetime.now().strftime('%B %d, %Y')),
+      text='Entries: %i' % (len(entries)),
+      pagetitle='Counts for %s' % (reqDate.strftime(niceDateFormat)),
       baseurl=url_for('ep_counters'),
-      pointlike=False, # three-col layout
-      timespan=mode,
+      twocolumns=False, # three-col layout
+      reqdate=reqDate.strftime(dateFormat),
       entries=entries,
     )
 
 @app.route('/events')
-@app.route('/events/<mode>')
-def ep_events(mode='default'):
+@app.route('/events/<date>')
+def ep_events(date='default'):
     db=dbOpenDatabase(dbName)
-    now,lastMidnight,backTime,nH=timeBounds(mode)
+    reqDate,lastMidnight=timeBounds(date)
     entries=sorted(
         [
             locRow
@@ -124,23 +79,21 @@ def ep_events(mode='default'):
                 localiseRow(row)
                 for row in dbGetRows(
                     db,
-                    backTime,
-                    now,
+                    reqDate
                 )
             )
         ],
-        key=lambda lRow: lRow['time'],
+        key=lambda evt: evt['time'],
         reverse=True,
-    )[:maxRecentItems]
+    )
     #
-    hDesc='full day' if nH is None else 'last %s hours' % nH
     return render_template(
       "graphlist.html",
-      text='Recent items (%s): %i' % (hDesc,len(entries)),
-      pagetitle='Events for %s' % (datetime.now().strftime('%B %d, %Y')),
+      text='Entries: %i' % (len(entries)),
+      pagetitle='Hits for %s' % (reqDate.strftime(niceDateFormat)),
       baseurl=url_for('ep_events'),
-      pointlike=True, # this means: pointlike events, two-column layout
-      timespan=mode,
+      twocolumns=True, # this means: pointlike events, two-column layout
+      reqDate=reqDate.strftime(dateFormat),
       entries=entries,
     )
 

@@ -11,6 +11,9 @@ dbName = os.path.join(basedir,'database','opabinia.db')
 
 timeZone='Europe/Rome'
 
+dateFormat='%Y-%m-%d'
+niceDateFormat='%B %d, %Y'
+
 # UI settings
 defaultHoursBack=8
 recentnessTimeSpan=timedelta(hours=defaultHoursBack)

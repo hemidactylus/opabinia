@@ -15,13 +15,13 @@
           <div class="row">
             <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/4"
-                 class="btn btn-sm btn-primary {%- if timespan=='4' -%} active {%- endif -%}" style="width: 100%;">
+                 class="btn btn-sm btn-primary {%- if reqdate=='4' -%} active {%- endif -%}" style="width: 100%;">
                 Today
               </a>
             </div>
             <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/8"
-                 class="btn btn-sm btn-primary {%- if timespan=='8' -%} active {%- endif -%}" style="width: 100%;">
+                 class="btn btn-sm btn-primary {%- if reqdate=='8' -%} active {%- endif -%}" style="width: 100%;">
                 Yesterday
               </a>
             </div>
@@ -30,7 +30,7 @@
             </div>
             <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/fullday"
-                 class="btn btn-sm btn-primary {%- if timespan=='fullday' -%} active {%- endif -%}" style="width: 100%;">
+                 class="btn btn-sm btn-primary {%- if reqdate=='fullday' -%} active {%- endif -%}" style="width: 100%;">
                 Choose ...
               </a>
             </div>
@@ -57,7 +57,7 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  {% if pointlike %}
+                  {% if twocolumns %}
                     <th class="col col-sm-6">
                       Time
                     </th>
@@ -87,7 +87,7 @@
                       ---
                     {% endif %}
                   </td>
-                  {% if not pointlike %}
+                  {% if not twocolumns %}
                     <td>
                       {{ ent.abscount }}
                     </td>

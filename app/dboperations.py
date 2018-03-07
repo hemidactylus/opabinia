@@ -15,6 +15,12 @@ from dbtools import (
     dbCreateTable,
 )
 
+from dateutils import (
+    findPreviousMidnight,
+)
+
+from config import dateFormat
+
 from dbschema import dbTablesDesc
 
 def setRWAttributeForAll(filename):
@@ -39,8 +45,8 @@ def checkAndOpenDatabase(dbName):
         print('Done.')
     return dbOpenDatabase(dbName)
 
-def dbGetRows(db,startDate=None, endDate=None):
-    whereClause=prepareWhereClause('time',startDate,endDate)
+def dbGetRows(db,reqDate):
+    whereClause='date = \'%s\'' % reqDate.strftime(dateFormat)
     return dbRetrieveAllRecords(db,'counts',whereClause=whereClause)
 
 def dbSaveRow(db, record):
@@ -50,45 +56,21 @@ def dbSaveRow(db, record):
     finalRecord['time']=now
     dbAddRecordToTable(db,'counts',finalRecord)
 
-def integrateRows(db, zeroDate=None, startDate=None, endDate=None):
+def integrateRows(db, reqDate):
     '''
-        zeroDate is the left extreme of integration
-        startDate is the first date to track in making the explicit list
-        endDate is the end of the required time.
-
-        Returned is an array of integrated values
-        for all recorded ticks between startDate and endDate
+        sorts and integrates (over time) the rows
+        pertaining to the requested date, with
+        a zero integration constant.
     '''
-    #
-    print(startDate)
-    whereClause=prepareWhereClause('time',zeroDate,endDate)
     #
     summedKeys={'count','abscount'}
     ini={k:0 for k in summedKeys}
-    #
-    rowCursor=dbRetrieveAllRecords(db,'counts',whereClause=whereClause)
-    # traceless part (all the way to startDate)
-    lastFound=None
-    for doc in rowCursor:
-        if doc['time']>=startDate:
-            lastFound=doc
-            break
-        else:
-            ini={
-                k: ini[k]+doc[k]
-                for k in summedKeys
-            }
-    #
-    ini['time']=startDate
+    ini['time']=findPreviousMidnight(reqDate)
     results=[ini]
-    if lastFound is not None:
-        ini={
-            k: ini[k]+lastFound[k]
-            for k in summedKeys
-        }
-        ini['time']=lastFound['time']
-        results.append(ini)
-    # we have come to the traceful part
+    #
+    whereClause='date = \'%s\'' % reqDate.strftime(dateFormat)
+    rowCursor=dbRetrieveAllRecords(db,'counts',whereClause=whereClause)
+    #
     for doc in rowCursor:
         ini={
             k: ini.get(k,0)+doc.get(k,0)

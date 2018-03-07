@@ -43,18 +43,22 @@
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class="active">
-                <a href="{{ url_for('ep_counters',mode=timespan) }}">
+                {% if reqdate %}
+                  <a href="{{ url_for('ep_counters',date=reqdate) }}">
+                {% else %}
+                  <a href="{{ url_for('ep_counters') }}">
+                {% endif %}
                   <img class=".img-responsive" src="/static/images/icon.png" alt="Logo" height=25px>
-                  Home
+                  Counts
                 </a>
               </li>
               <li>
-                {% if timespan %}
-                  <a href="{{ url_for('ep_events',mode=timespan) }}">
+                {% if reqdate %}
+                  <a href="{{ url_for('ep_events',date=reqdate) }}">
                 {% else %}
                   <a href="{{ url_for('ep_events') }}">
                 {% endif %}
-                  Events
+                  Hits
                 </a>
               </li>
               <li>

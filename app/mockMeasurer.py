@@ -6,6 +6,7 @@
 from __future__ import print_function
 
 from time import sleep
+from datetime import datetime
 from random import random
 import sys
 
@@ -27,7 +28,7 @@ if __name__=='__main__':
     print('Init mock measurer.')
     while True:
         tVal=-1 if random()<0.5 else +1
-        print('*',end='')
+        print('* %s *' % datetime.now().strftime('%H:%M:%S'))
         sys.stdout.flush()
         dbSaveRow(db,{'count':tVal,'abscount':abs(tVal)})
         db.commit()
