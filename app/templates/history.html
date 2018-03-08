@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="container">
+      <div class="row" style="margin-bottom: 80px;">
+        <div class="col-md-12">
+          <h2> {{ pagetitle }} </h2>
+        </div>
+        <div class="col-md-12">
+          {% for d,val in history.items() | sort %}
+                <p>
+                  <b>{{ d }}</b>
+                  {{ val }}
+                </p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {% block footer %}
+        {{ super() }}
+    {% endblock %}
+
+{% endblock %}
+

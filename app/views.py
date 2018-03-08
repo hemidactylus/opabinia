@@ -105,6 +105,19 @@ def ep_events(date='today'):
       cdtarget='events',
     )
 
+@app.route('/history')
+def ep_history():
+    db=dbOpenDatabase(dbName)
+    dates=dbGetDateList(db)
+    history={
+        d: integrateRows(db,d,cumulate=False)
+        for d in dates
+    }
+    return render_template(
+        'history.html',
+        history=history
+    )
+
 @app.route('/about')
 def ep_about():
     return render_template(

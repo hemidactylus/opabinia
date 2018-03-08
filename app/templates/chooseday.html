@@ -9,9 +9,9 @@
           <h2> {{ pagetitle }} </h2>
         </div>
         <div class="col-md-12">
-          {% for year,ylist in datetree.items() %}
+          {% for year,ylist in datetree.items() | sort %}
             <h3 style="margin-top: 20px;"> {{ year }} </h3>
-            {% for month,mlist in ylist.items() %}
+            {% for month,mlist in ylist.items() | sort %}
               <h4> {{ monthnames[month-1] }} ({{ year }}) </h4>
               {% for date in mlist %}
                 <a

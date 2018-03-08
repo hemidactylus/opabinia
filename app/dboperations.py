@@ -56,17 +56,24 @@ def dbSaveRow(db, record):
     finalRecord['time']=now
     dbAddRecordToTable(db,'counts',finalRecord)
 
-def integrateRows(db, reqDate):
+def integrateRows(db, reqDate, cumulate=True):
     '''
         sorts and integrates (over time) the rows
         pertaining to the requested date, with
         a zero integration constant.
+
+        if cumulate, the whole cumsum is returned;
+        otherwise, only the final sum.
+
     '''
     #
     summedKeys={'count','abscount'}
     ini={k:0 for k in summedKeys}
-    ini['time']=findPreviousMidnight(reqDate)
-    results=[ini]
+    if cumulate:
+        ini['time']=findPreviousMidnight(reqDate)
+        results=[ini]
+    else:
+        maxFound=0
     #
     whereClause='date = \'%s\'' % reqDate.strftime(dateFormat)
     rowCursor=dbRetrieveAllRecords(db,'counts',whereClause=whereClause)
@@ -76,9 +83,18 @@ def integrateRows(db, reqDate):
             k: ini.get(k,0)+doc.get(k,0)
             for k in summedKeys
         }
-        ini['time']=doc['time']
-        results.append(ini)
-    return results
+        if cumulate:
+            ini['time']=doc['time']
+            results.append(ini)
+        else:
+            maxFound=max(maxFound,ini['count'])
+    if cumulate:
+        return results
+    else:
+        result={k:v for k,v in ini.items()}
+        result['max']=maxFound
+        result['date']=reqDate
+        return result
 
 def dbGetDateList(db):
     return sorted(
