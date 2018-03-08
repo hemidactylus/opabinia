@@ -4,17 +4,99 @@
     {{ super() }}
 
     <div class="container">
-      <div class="row" style="margin-bottom: 80px;">
-        <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12" style="text-align: center;">
           <h2> {{ pagetitle }} </h2>
         </div>
-        <div class="col-md-12">
-          {% for d,val in history.items() | sort %}
-                <p>
-                  <b>{{ d }}</b>
-                  {{ val }}
-                </p>
-          {% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="col-md-offset-4 col-md-4 col-sm-12">
+          <div class="row">
+            <div class="col-md-3 col-sm-3">
+              <a href="{{ url_for('ep_history',daysback='7') }}"
+                 class="btn btn-sm btn-primary {%- if daysback=='7' -%} active {%- endif -%}" style="width: 100%;">
+                7 Days
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-3">
+              <a href="{{ url_for('ep_history',daysback='30') }}"
+                 class="btn btn-sm btn-primary {%- if daysback=='30' -%} active {%- endif -%}" style="width: 100%;">
+                30 Days
+              </a>
+            </div>
+            <div class="col-md-3 col-sm-3" style="text-align: center; margin-bottom: 12px;">
+                <img src="/static/images/opabinia.png" height="35px">
+            </div>
+            <div class="col-md-3 col-sm-3">
+              <a href="{{ url_for('ep_history',daysback='forever') }}"
+                 class="btn btn-sm btn-primary {%- if daysback=='forever' -%} active {%- endif -%}" style="width: 100%;">
+                Forever
+              </a>
+            </div>
+          </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" style="text-align: center; margin-top: 20px;">
+          {{ text }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8 col-sm-6">
+          <p>
+              (here the plot should be)
+          </p>
+          <p>
+            <img src="/static/images/opabinia.png" width="80%">
+          </p>
+        </div>
+        <div class="col-md-4 col-sm-6" style="margin-bottom: 80px;">
+          <div style="overflow: auto; height: 400px;">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th class="col col-sm-6">
+                    Time
+                  </th>
+                  <th class="col col-sm-2">
+                    Max In
+                  </th>
+                  <th class="col col-sm-2">
+                    Hits
+                  </th>
+                  <th class="col col-sm-2">
+                    Bias
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for histdate,histitem in history.items() | sort(reverse=True) %}
+                <tr>
+                  <td>
+                    {{ histdate.strftime('%B %d, %Y') }}
+                  </td>
+                  <td>
+                    {{ histitem.max }}
+                  </td>
+                  <td>
+                    {{ histitem.abscount }}
+                  </td>
+                  <td>
+                    {% if histitem.count < 0 %}
+                      <span style="color: red; font-weight: bold;">
+                    {% endif %}
+                      {{ "%+i" % histitem.count }}
+                    {% if histitem.count < 0 %}
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

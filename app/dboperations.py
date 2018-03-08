@@ -96,10 +96,22 @@ def integrateRows(db, reqDate, cumulate=True):
         result['date']=reqDate
         return result
 
-def dbGetDateList(db):
+def dbGetDateList(db,startDate=None):
+    #
+    if startDate is not None:
+        whereClause='date >= \'%s\'' % startDate.strftime(dateFormat)
+    else:
+        whereClause=None
+    #
     return sorted(
         tp[0]
-        for tp in db.cursor().execute('SELECT DISTINCT(date) FROM counts;')
+        for tp in db.cursor().execute(
+            'SELECT DISTINCT(date) FROM counts %s;' % (
+                ''
+                if whereClause is None
+                else ' WHERE %s' % whereClause
+            )
+        )
     )
 
 if __name__=='__main__':

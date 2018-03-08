@@ -81,17 +81,13 @@
               {% for ent in entries %}
                 <tr>
                   <td>
-                    {% if ent.time %}
-                      {{ ent.time.strftime('%H:%M:%S') }}
-                    {% else %}
-                      ---
-                    {% endif %}
+                    {{ ent.time.strftime('%H:%M:%S') }}
                   </td>
                   {% if not twocolumns %}
                     <td>
                       {{ ent.abscount }}
                     </td>
-                 {% endif %}
+                  {% endif %}
                   <td>
                     {% if ent.count < 0 %}
                       <span style="color: red; font-weight: bold;">

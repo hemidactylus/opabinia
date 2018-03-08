@@ -106,16 +106,35 @@ def ep_events(date='today'):
     )
 
 @app.route('/history')
-def ep_history():
+@app.route('/history/<daysback>')
+def ep_history(daysback='7'):
     db=dbOpenDatabase(dbName)
-    dates=dbGetDateList(db)
+    #
+    if daysback!='forever':
+        try:
+            dbackInt=int(daysback)
+            # to seek up to n days in the past,
+            # we go back n-2 days: one because of the ">=" in the query,
+            # one ... well I admit I have no idea but it seems to work. Damn trial-and-error,
+            # damn dates.
+            firstDate=findPreviousMidnight(datetime.utcnow())-timedelta(days=dbackInt-2)
+        except:
+            firstDate=None
+    else:
+        firstDate=None
+    #
+    print('FIRSTDATE %s' % str(firstDate))
+    dates=dbGetDateList(db,startDate=firstDate)
     history={
         d: integrateRows(db,d,cumulate=False)
         for d in dates
     }
     return render_template(
         'history.html',
-        history=history
+        pagetitle='History',
+        text='History for Opabinia',
+        history=history,
+        daysback=daysback,
     )
 
 @app.route('/about')
