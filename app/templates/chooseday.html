@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="container">
+      <div class="row" style="margin-bottom: 80px;">
+        <div class="col-md-12">
+          <h2> {{ pagetitle }} </h2>
+        </div>
+        <div class="col-md-12">
+          {% for year,ylist in datetree.items() %}
+            <h3 style="margin-top: 20px;"> {{ year }} </h3>
+            {% for month,mlist in ylist.items() %}
+              <h4> {{ monthnames[month-1] }} ({{ year }}) </h4>
+              {% for date in mlist %}
+                <a
+                    class="btn btn-sm {% if date['weekday'] %} btn-primary {% else %} btn-secondary {% endif %}"
+                    href="{{ url_for(epname,date=date['date'].strftime('%Y-%m-%d')) }}"
+                >
+                  {{ date['date'].day }}
+                </a>
+              {% endfor %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {% block footer %}
+        {{ super() }}
+    {% endblock %}
+
+{% endblock %}
+

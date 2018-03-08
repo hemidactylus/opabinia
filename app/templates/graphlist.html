@@ -14,14 +14,14 @@
         <div class="col-md-offset-4 col-md-4 col-sm-12">
           <div class="row">
             <div class="col-md-3 col-sm-3">
-              <a href="{{ baseurl }}/4"
-                 class="btn btn-sm btn-primary {%- if reqdate=='4' -%} active {%- endif -%}" style="width: 100%;">
+              <a href="{{ baseurl }}/today"
+                 class="btn btn-sm btn-primary {%- if reqdate=='today' -%} active {%- endif -%}" style="width: 100%;">
                 Today
               </a>
             </div>
             <div class="col-md-3 col-sm-3">
-              <a href="{{ baseurl }}/8"
-                 class="btn btn-sm btn-primary {%- if reqdate=='8' -%} active {%- endif -%}" style="width: 100%;">
+              <a href="{{ baseurl }}/yesterday"
+                 class="btn btn-sm btn-primary {%- if reqdate=='yesterday' -%} active {%- endif -%}" style="width: 100%;">
                 Yesterday
               </a>
             </div>
@@ -29,9 +29,9 @@
                 <img src="/static/images/opabinia.png" height="35px">
             </div>
             <div class="col-md-3 col-sm-3">
-              <a href="{{ baseurl }}/fullday"
-                 class="btn btn-sm btn-primary {%- if reqdate=='fullday' -%} active {%- endif -%}" style="width: 100%;">
-                Choose ...
+              <a href=" {{ url_for('ep_chooseday',target=cdtarget) }} "
+                 class="btn btn-sm btn-primary" style="width: 100%;">
+                Other ...
               </a>
             </div>
           </div>

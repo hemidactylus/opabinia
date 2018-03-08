@@ -38,40 +38,46 @@ from dateutils import (
     localiseDate,
     localiseRow,
     timeBounds,
+    normaliseReqDate,
+    monthNames,
 )
+
+from dictutils import makeDateListToTree
 
 @app.route('/')
 @app.route('/counters')
 @app.route('/counters/<date>')
-def ep_counters(date='default'):
+def ep_counters(date='today'):
     db=dbOpenDatabase(dbName)
-    reqDate,lastMidnight=timeBounds(date)
+    queryDate,lastMidnight=timeBounds(date)
     entries=sorted(
         [
             localiseRow(row)
             for row in integrateRows(
                 db,
-                reqDate,
+                queryDate,
             )
         ],
         key=lambda evt: evt['time'],
         reverse=True,
     )
+    reqdate=normaliseReqDate(date)
     return render_template(
       "graphlist.html",
       text='Entries: %i' % (len(entries)),
-      pagetitle='Counts for %s' % (reqDate.strftime(niceDateFormat)),
+      pagetitle='Counts for %s' % (queryDate.strftime(niceDateFormat)),
       baseurl=url_for('ep_counters'),
       twocolumns=False, # three-col layout
-      reqdate=reqDate.strftime(dateFormat),
+      reqdate=reqdate,
       entries=entries,
+      cdtarget='counters',
     )
 
 @app.route('/events')
 @app.route('/events/<date>')
-def ep_events(date='default'):
+def ep_events(date='today'):
     db=dbOpenDatabase(dbName)
-    reqDate,lastMidnight=timeBounds(date)
+    queryDate,lastMidnight=timeBounds(date)
     entries=sorted(
         [
             locRow
@@ -79,7 +85,7 @@ def ep_events(date='default'):
                 localiseRow(row)
                 for row in dbGetRows(
                     db,
-                    reqDate
+                    queryDate
                 )
             )
         ],
@@ -87,14 +93,16 @@ def ep_events(date='default'):
         reverse=True,
     )
     #
+    reqdate=normaliseReqDate(date)
     return render_template(
       "graphlist.html",
       text='Entries: %i' % (len(entries)),
-      pagetitle='Hits for %s' % (reqDate.strftime(niceDateFormat)),
+      pagetitle='Hits for %s' % (queryDate.strftime(niceDateFormat)),
       baseurl=url_for('ep_events'),
       twocolumns=True, # this means: pointlike events, two-column layout
-      reqDate=reqDate.strftime(dateFormat),
+      reqdate=reqdate,
       entries=entries,
+      cdtarget='events',
     )
 
 @app.route('/about')
@@ -105,9 +113,26 @@ def ep_about():
     )
 
 @app.route('/chooseday')
-def ep_chooseday():
+@app.route('/chooseday/<target>')
+def ep_chooseday(target='counters'):
     db=dbOpenDatabase(dbName)
-    return '\n'.join(
-        str(d)
-        for d in dbGetDateList(db)
+    dates=dbGetDateList(db)
+    dateTree=makeDateListToTree(dates)
+
+    # these are the names of the endpoint functions!
+    epname={
+        'counters': 'ep_counters',
+        'events': 'ep_events',
+    }.get(target,'ep_counters')
+    eptitle={
+        'counters': 'Counts',
+        'events': 'Hits',
+    }.get(target,'Counts')
+
+    return render_template(
+        'chooseday.html',
+        pagetitle='Select the date for %s' % eptitle,
+        datetree=dateTree,
+        epname=epname,
+        monthnames=monthNames,
     )
