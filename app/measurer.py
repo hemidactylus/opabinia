@@ -14,8 +14,10 @@ import pigpio
 from config import (
     dbName,
     #
-    sensorTrigger,
-    sensorEcho,
+    sensorTriggerR,
+    sensorEchoR,
+    sensorTriggerL,
+    sensorEchoL,
     #
     sensorReadFrequency,
     sensorDistanceRange,
@@ -133,7 +135,8 @@ if __name__=='__main__':
 
     print('Init.')
     pi=pigpio.pi()
-    distancer=DistanceSensor(pi,sensorTrigger,sensorEcho)
+    distancerR=DistanceSensor(pi,sensorTriggerR,sensorEchoR)
+    distancerL=DistanceSensor(pi,sensorTriggerL,sensorEchoL)
 
     db=checkAndOpenDatabase(dbName)
 
@@ -143,14 +146,22 @@ if __name__=='__main__':
     pi.write(statusLed,0)
     pi.write(debStatusLed,0)
 
-    deb = DebouncedSensor(
+    debR = DebouncedSensor(
         sensorDistanceRange,
         sensorDebounceTime,
-        distancer,
+        distancerR,
         sensorRefractoryTime,
         avgDampRate=sensorDampRate,
         avgThresholdFactor=sensorThresholdFactor,
-        )
+    )
+    debL = DebouncedSensor(
+        sensorDistanceRange,
+        sensorDebounceTime,
+        distancerL,
+        sensorRefractoryTime,
+        avgDampRate=sensorDampRate,
+        avgThresholdFactor=sensorThresholdFactor,
+    )
 
     def increaseCallbacker(instaStatus,debStatus,pi=pi,statusLed=debStatusLed,baseLed=baseStatusLed):
         if debStatus:
@@ -165,9 +176,12 @@ if __name__=='__main__':
         pi.write(baseLed,not(instaStatus or debStatus))
         pi.write(statusLed,int(instaStatus))
 
-    deb.onDebouncedChange(increaseCallbacker)
-    deb.onChange(statusCallbacker)
+    debR.onDebouncedChange(increaseCallbacker)
+    debR.onChange(statusCallbacker)
+    debL.onDebouncedChange(increaseCallbacker)
+    debL.onChange(statusCallbacker)
 
     while True:
-        deb.update()
-        time.sleep(sensorReadFrequency)
+        for deb in [debR, debL]:
+            deb.update()
+            time.sleep(sensorReadFrequency)

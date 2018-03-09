@@ -21,4 +21,19 @@ dbTablesDesc={
             ],
         },
     },
+    'history': {
+        'primary_key': [
+            ('date', 'DATE'),
+        ],
+        'columns': [
+            ('count','INTEGER'),
+            ('abscount','INTEGER'),
+            ('max','INTEGER'),
+        ],
+        'indices': {
+            'history_date_index': [
+                ('date', 'ASC'),
+            ],
+        },
+    },
 }

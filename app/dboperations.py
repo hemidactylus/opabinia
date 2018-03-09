@@ -10,6 +10,7 @@ from dbtools import (
     dbOpenDatabase,
     prepareWhereClause,
     dbRetrieveAllRecords,
+    dbRetrieveRecordByKey,
     dbAddRecordToTable,
     dbDeleteTable,
     dbCreateTable,
@@ -17,6 +18,7 @@ from dbtools import (
 
 from dateutils import (
     findPreviousMidnight,
+    localiseDate,
 )
 
 from config import dateFormat
@@ -52,9 +54,18 @@ def dbGetRows(db,reqDate):
 def dbSaveRow(db, record):
     finalRecord={k :v for k,v in record.items()}
     now=datetime.utcnow()
-    finalRecord['date']=now.date()
+    finalRecord['date']=localiseDate(now).date()
     finalRecord['time']=now
     dbAddRecordToTable(db,'counts',finalRecord)
+
+def dbSaveHistory(db, record):
+    '''
+        the history item should be completely done by this time
+    '''
+    dbAddRecordToTable(db,'history',record)
+
+def dbGetHistory(db, date):
+    return dbRetrieveRecordByKey(db,'history',date)
 
 def integrateRows(db, reqDate, cumulate=True):
     '''
@@ -65,6 +76,9 @@ def integrateRows(db, reqDate, cumulate=True):
         if cumulate, the whole cumsum is returned;
         otherwise, only the final sum.
 
+        * upon a cumulate=false call, a day that is old enough
+          can be cached for speedy lookup later.
+
     '''
     #
     summedKeys={'count','abscount'}
@@ -73,6 +87,13 @@ def integrateRows(db, reqDate, cumulate=True):
         ini['time']=findPreviousMidnight(reqDate)
         results=[ini]
     else:
+        # check if on cache
+        cacheable=reqDate < localiseDate(datetime.utcnow()).date()
+        if cacheable:
+            cachedDoc=dbGetHistory(db,{'date':reqDate})
+            if cachedDoc is not None:
+                return cachedDoc
+        #
         maxFound=0
     #
     whereClause='date = \'%s\'' % reqDate.strftime(dateFormat)
@@ -94,6 +115,11 @@ def integrateRows(db, reqDate, cumulate=True):
         result={k:v for k,v in ini.items()}
         result['max']=maxFound
         result['date']=reqDate
+        # cache to 'history' if old enough
+        if cacheable:
+            dbSaveHistory(db,result)
+            db.commit() # it would be nice to move this to a datelist-level!
+        #
         return result
 
 def dbGetDateList(db,startDate=None):

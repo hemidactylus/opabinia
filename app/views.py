@@ -123,7 +123,6 @@ def ep_history(daysback='7'):
     else:
         firstDate=None
     #
-    print('FIRSTDATE %s' % str(firstDate))
     dates=dbGetDateList(db,startDate=firstDate)
     history={
         d: integrateRows(db,d,cumulate=False)

@@ -20,8 +20,10 @@ recentnessTimeSpan=timedelta(hours=defaultHoursBack)
 maxRecentItems=None # None=no cuts applied
 
 # sensor setup (this'll become an array of two)
-sensorTrigger=  18
-sensorEcho=     24
+sensorTriggerR=   18
+sensorEchoR=      24
+sensorTriggerL=   12
+sensorEchoL=      25
 # sensor response setup
 sensorReadFrequency=0.005           # seconds
 sensorDistanceRange=[0.10,0.95]     # meters: min/max

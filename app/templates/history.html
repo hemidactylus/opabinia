@@ -58,7 +58,7 @@
               <thead>
                 <tr>
                   <th class="col col-sm-6">
-                    Time
+                    Date
                   </th>
                   <th class="col col-sm-2">
                     Max In
@@ -75,7 +75,9 @@
               {% for histdate,histitem in history.items() | sort(reverse=True) %}
                 <tr>
                   <td>
-                    {{ histdate.strftime('%B %d, %Y') }}
+                    <a href=" {{ url_for('ep_counters', date=histdate.strftime('%Y-%m-%d')) }} ">
+                      {{ histdate.strftime('%B %d, %Y') }}
+                    </a>
                   </td>
                   <td>
                     {{ histitem.max }}

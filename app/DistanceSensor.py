@@ -42,8 +42,8 @@ class DistanceSensor:
       return self._time/5830.0 # metres
 
 if __name__=='__main__':
-   testTrigger=18
-   testEcho=24
+   testTrigger=12
+   testEcho=25
    pi=pigpio.pi()
    distancer = DistanceSensor(pi,testTrigger,testEcho)
    while(True):
