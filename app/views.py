@@ -65,12 +65,15 @@ def ep_counters(date='today'):
     return render_template(
       "graphlist.html",
       text='Entries: %i' % (len(entries)),
-      pagetitle='Counts for %s' % (queryDate.strftime(niceDateFormat)),
+      pagetype='Counts',
+      pagetitle='Counts',
       baseurl=url_for('ep_counters'),
+      queryDate=queryDate,
       twocolumns=False, # three-col layout
       reqdate=reqdate,
       entries=entries,
       cdtarget='counters',
+      niceDateFormat=niceDateFormat,
     )
 
 @app.route('/events')
@@ -97,12 +100,15 @@ def ep_events(date='today'):
     return render_template(
       "graphlist.html",
       text='Entries: %i' % (len(entries)),
-      pagetitle='Hits for %s' % (queryDate.strftime(niceDateFormat)),
+      pagetype='Hits',
+      pagetitle='Hits',
       baseurl=url_for('ep_events'),
       twocolumns=True, # this means: pointlike events, two-column layout
       reqdate=reqdate,
+      queryDate=queryDate,
       entries=entries,
       cdtarget='events',
+      niceDateFormat=niceDateFormat,
     )
 
 @app.route('/history')
@@ -131,9 +137,10 @@ def ep_history(daysback='7'):
     return render_template(
         'history.html',
         pagetitle='History',
-        text='History for Opabinia',
         history=history,
         daysback=daysback,
+        dateFormat=dateFormat,
+        niceDateFormat=niceDateFormat,
     )
 
 @app.route('/about')
@@ -166,4 +173,9 @@ def ep_chooseday(target='counters'):
         datetree=dateTree,
         epname=epname,
         monthnames=monthNames,
+        dateFormat=dateFormat,
     )
+
+@app.route('/download_history')
+def ep_download_history():
+    return 'X'

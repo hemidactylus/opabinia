@@ -39,7 +39,7 @@
 
       <div class="row">
         <div class="col-md-12" style="text-align: center; margin-top: 20px;">
-          {{ text }}
+          History (<a href="{{ url_for('ep_download_history') }}">download...</a>)
         </div>
       </div>
 
@@ -75,8 +75,8 @@
               {% for histdate,histitem in history.items() | sort(reverse=True) %}
                 <tr>
                   <td>
-                    <a href=" {{ url_for('ep_counters', date=histdate.strftime('%Y-%m-%d')) }} ">
-                      {{ histdate.strftime('%B %d, %Y') }}
+                    <a href=" {{ url_for('ep_counters', date=histdate.strftime(dateFormat)) }} ">
+                      {{ histdate.strftime(niceDateFormat) }}
                     </a>
                   </td>
                   <td>

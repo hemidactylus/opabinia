@@ -16,7 +16,7 @@
               {% for date in mlist %}
                 <a
                     class="btn btn-sm {% if date['weekday'] %} btn-primary {% else %} btn-secondary {% endif %}"
-                    href="{{ url_for(epname,date=date['date'].strftime('%Y-%m-%d')) }}"
+                    href="{{ url_for(epname,date=date['date'].strftime(dateFormat)) }}"
                 >
                   {{ date['date'].day }}
                 </a>

@@ -19,7 +19,9 @@ defaultHoursBack=8
 recentnessTimeSpan=timedelta(hours=defaultHoursBack)
 maxRecentItems=None # None=no cuts applied
 
-# sensor setup (this'll become an array of two)
+# sensor setup
+#    (left and right sensor pin setup.
+#     L/R refer to someone looking at the sensors).
 sensorTriggerR=   18
 sensorEchoR=      24
 sensorTriggerL=   12
