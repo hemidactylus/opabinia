@@ -178,4 +178,10 @@ def ep_chooseday(target='counters'):
 
 @app.route('/download_history')
 def ep_download_history():
-    return 'X'
+    from spreadsheets import testSpreadsheet
+    spd = testSpreadsheet()
+    return send_file (
+        spd,
+        attachment_filename='test.xlsx',
+        as_attachment=True,
+    )
