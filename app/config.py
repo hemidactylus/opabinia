@@ -20,21 +20,33 @@ recentnessTimeSpan=timedelta(hours=defaultHoursBack)
 maxRecentItems=None # None=no cuts applied
 
 # sensor setup
-#    (left and right sensor pin setup.
+#    (Right=0 and Left=1 sensor pin setup.
 #     L/R refer to someone looking at the sensors).
-sensorTriggerR=   18
-sensorEchoR=      24
-sensorTriggerL=   12
-sensorEchoL=      25
+sensorPins=[
+    {
+        'trigger': 18,
+        'echo':    24,
+    },
+    {
+        'trigger': 12,
+        'echo':    25,
+    },
+]
+# which way is 'entering' (i.e. +1)?
+innerSensor=0 # i.e. the R one is the one closer to 'in'
 # sensor response setup
-sensorReadFrequency=0.005           # seconds
-sensorDistanceRange=[0.10,0.95]     # meters: min/max
+sensorReadFrequency=0.002           # seconds
+sensorDistanceRange=[0.10,1.20]     # meters: min/max
 sensorDebounceTime=0.05             # seconds
 sensorRefractoryTime=2.0            # seconds
+sensorPassageWindow=[0.1,0.8]       # seconds
 # expwindow sensor settings
 sensorDampRate=0.6
 sensorThresholdFactor=0.3
 # status-signaling LEDs
-statusLed=20      # instantaneous measurement (yellow)
-debStatusLed=16   # debounced status (red)
-baseStatusLed=21  # baseline, operation (green)
+ledPins={
+    'baseline': [21],       # baseline, operation (green) - only one
+    # these are [R, L] in the same way as the sensorPins above
+    'signal':   [20, 26],   # instantaneous measurement (yellow)
+    'detect':   [16, 19],   # debounced status (red)
+}

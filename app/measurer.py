@@ -14,22 +14,19 @@ import pigpio
 from config import (
     dbName,
     #
-    sensorTriggerR,
-    sensorEchoR,
-    sensorTriggerL,
-    sensorEchoL,
+    sensorPins,
+    innerSensor,
     #
     sensorReadFrequency,
     sensorDistanceRange,
     sensorDebounceTime,
     sensorRefractoryTime,
+    sensorPassageWindow,
     #
     sensorDampRate,
     sensorThresholdFactor,
     #
-    statusLed,
-    debStatusLed,
-    baseStatusLed,
+    ledPins,
 )
 from dboperations import (
     checkAndOpenDatabase,
@@ -108,7 +105,7 @@ class DebouncedSensor:
         instaStatus=tMeasure>=self.min and tMeasure<=self.max
         if instaStatus!=self.instaStatus:
             self.instaStatus=instaStatus
-            self.callback(self.instaStatus,self.debStatus)
+            self.callback()
         #
         self.avgStatus=self.avgRate*self.avgStatus+self.instaStatus
         newStatus=self.avgStatus>self.avgThreshold
@@ -129,59 +126,71 @@ class DebouncedSensor:
                     if self.debStatus:
                         self.lastDebouncedHigh=now
                     if self.debCallback is not None:
-                        self.debCallback(self.instaStatus,self.debStatus)
+                        self.debCallback()
 
 if __name__=='__main__':
 
     print('Init.')
-    pi=pigpio.pi()
-    distancerR=DistanceSensor(pi,sensorTriggerR,sensorEchoR)
-    distancerL=DistanceSensor(pi,sensorTriggerL,sensorEchoL)
-
     db=checkAndOpenDatabase(dbName)
+    pi=pigpio.pi()
+
+    distancers=[
+        DistanceSensor(pi,sPins['trigger'],sPins['echo'])
+        for sPins in sensorPins
+    ]
+    debounceds=[
+        DebouncedSensor(
+            sensorDistanceRange,
+            sensorDebounceTime,
+            distancer,
+            sensorRefractoryTime,
+            avgDampRate=sensorDampRate,
+            avgThresholdFactor=sensorThresholdFactor,
+        )
+        for distancer in distancers
+    ]
 
     # led setup
-    pi.set_mode(statusLed,pigpio.OUTPUT)
-    pi.set_mode(debStatusLed,pigpio.OUTPUT)
-    pi.write(statusLed,0)
-    pi.write(debStatusLed,0)
+    for ledPin in (ledPin for ledPinGroup in ledPins.values() for ledPin in ledPinGroup):
+        pi.set_mode(ledPin,pigpio.OUTPUT)
+        pi.write(ledPin,0)
 
-    debR = DebouncedSensor(
-        sensorDistanceRange,
-        sensorDebounceTime,
-        distancerR,
-        sensorRefractoryTime,
-        avgDampRate=sensorDampRate,
-        avgThresholdFactor=sensorThresholdFactor,
-    )
-    debL = DebouncedSensor(
-        sensorDistanceRange,
-        sensorDebounceTime,
-        distancerL,
-        sensorRefractoryTime,
-        avgDampRate=sensorDampRate,
-        avgThresholdFactor=sensorThresholdFactor,
-    )
+    # callbacks to register in the debounceds
+    def debouncedCallback(debIndex,debounceds=debounceds,pi=pi,ledPins=ledPins,db=db):
+        '''
+            debIndex is the index in 'debounced' of who triggered the callback
+        '''
+        thisDeb=debounceds[debIndex]
+        # if this sensor went UP and the other one went UP in a recency timewindow,
+        # call it a +/- 1 and commit it.
+        if thisDeb.debStatus:
+            activationDelay=thisDeb.lastDebouncedHigh - debounceds[1-debIndex].lastDebouncedHigh
+            if activationDelay <= sensorPassageWindow[1] and activationDelay >= sensorPassageWindow[0]:
+                # +/-1 event detected. Direction is determined
+                # based on which sensor was this, and what is the 'inside'-facing sensor.
+                direction=(2*debIndex-1)*(2*innerSensor-1)
+                dbSaveRow(db,{'count':direction,'abscount':1})
+                db.commit()
+        #
+        handleBaselineLed()
+        pi.write(ledPins['detect'][debIndex],thisDeb.debStatus)
 
-    def increaseCallbacker(instaStatus,debStatus,pi=pi,statusLed=debStatusLed,baseLed=baseStatusLed):
-        if debStatus:
-            # register a +1 increment in passage counts
-            dbSaveRow(db,{'count':1,'abscount':1})
-            print('Saving now a +1')
-            db.commit()
-        pi.write(baseLed,not(instaStatus or debStatus))
-        pi.write(statusLed,int(debStatus))
+    def changeCallback(debIndex,debounceds=debounceds,pi=pi,ledPins=ledPins,db=db):
+        thisDeb=debounceds[debIndex]
+        handleBaselineLed()
+        pi.write(ledPins['signal'][debIndex],thisDeb.instaStatus)
 
-    def statusCallbacker(instaStatus,debStatus,pi=pi,statusLed=statusLed,baseLed=baseStatusLed):
-        pi.write(baseLed,not(instaStatus or debStatus))
-        pi.write(statusLed,int(instaStatus))
+    def handleBaselineLed(debounceds=debounceds,ledPins=ledPins):
+        tTime=time.time()
+        noActivity=not any(deb.instaStatus or deb.debStatus for deb in debounceds)
+        pi.write(ledPins['baseline'][0],noActivity * (int(tTime*2) % 2) )
 
-    debR.onDebouncedChange(increaseCallbacker)
-    debR.onChange(statusCallbacker)
-    debL.onDebouncedChange(increaseCallbacker)
-    debL.onChange(statusCallbacker)
+    for dIndex,deb in enumerate(debounceds):
+        deb.onDebouncedChange(lambda d=dIndex: debouncedCallback(d))
+        deb.onChange(lambda d=dIndex: changeCallback(d))
 
     while True:
-        for deb in [debR, debL]:
+        for deb in debounceds:
             deb.update()
+            handleBaselineLed()
             time.sleep(sensorReadFrequency)

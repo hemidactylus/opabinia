@@ -45,7 +45,8 @@ for it and the magic of `DHCP` works).
 
 Additionally, provided the Avahi daemon on the RPi plays nice with the local network,
 the app becomes available not only as `http://IP_ADDRESS/`, but also at the address
-[`http://pimpa.local/`](http://pimpa.local). _Disclaimer_ : for reasons still unclear to
+`http://HOSTNAME.local` (e.g. [`http://pimpa.local/`](http://pimpa.local)).
+_Disclaimer_ : for reasons still unclear to
 me, this sometimes works and sometimes doesn't, in a rather whimsical way. In the
 worst case one can issue a portscan command and figure out the local IP address
 of the RPi, whose ssh port 22 is open: that is, with the proper CIDR range for the
@@ -122,10 +123,11 @@ considering this machine will probably be dedicated to Opabinia.
 
     sudo apt-get install python-pip
 
-    sudo pip install Flask
-    sudo pip install uwsgi
-    sudo pip install pytz
-    sudo pip install flask_bootstrap
+    sudo pip install Flask==0.12.2
+    sudo pip install uWSGI==2.0.17
+    sudo pip install pytz==2018.3
+    sudo pip install Flask-Bootstrap==3.3.7.1
+    sudo pip install XlsxWriter==1.0.2
 
 Finally, install (as described [here](https://www.raspberrypi.org/forums/viewtopic.php?f=32&t=103752))
 the [`pigpiod`](http://abyz.me.uk/rpi/pigpio/pigpiod.html) package by Joan, making it also into a service:
