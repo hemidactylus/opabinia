@@ -17,20 +17,27 @@ to keep an eye on the counts.
 
 Opabinia is made with the following hardware (CHECK DETAILS):
   - a Raspberry Pi 2 B Quad Core CPU 900 MHz, 1 GB RAM
-  - a RPi case for aesthetics
+  - a RPi case for aesthetics (_optional_)
   - a microSD card with at least 4 GB space
-  - an 802.11g/b/n USB dongle (for WiFi connectivity)
+  - an 802.11g/b/n USB dongle (_for WiFi connectivity_)
   - two proximity sensors of type HC-SR04
-  - three LEDs
-  - resistors: 3 x 2.2k, 1 x 4.7k, 1 x 3.3k
+  - five LEDs
+  - resistors: 5 x 2.2k, 2 x 4.7k, 2 x 3.3k
   - wiring
   - some kind of breadboard, e.g. a 8 x 12cm double side prototype pcb breadboard
 
 ### Schematics
 
-The schematics are as follows (CHECK TO DO):
+The circuit layout is as follows:
 
-<img src="app/static/images/opabinia.png" alt="Logo"  width="25%"/>
+<img src="Docs/schematics/opabinia_bb.png" alt="Circuit schematics" width="90%"/>
+
+The Fritzing file for the above image is in `Doc/schematics`; however, due to the sloppy way
+three-wire junctions are made, it may open improperly.
+
+Moreover, the Fritzing project makes use of a custom part (`HC-SR04.fzpz`)
+for the proximity sensor, which can be obtained
+and imported [here](http://fritzing.org/projects/hc-sr04-project/).
 
 ### Software components
 
