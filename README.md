@@ -30,7 +30,7 @@ Opabinia is made with the following hardware (CHECK DETAILS):
 
 The circuit layout is as follows:
 
-<img src="Docs/schematics/opabinia_bb.png" alt="Circuit schematics" width="90%"/>
+<img src="Doc/schematics/opabinia_bb.png" alt="Circuit schematics" width="90%"/>
 
 The Fritzing file for the above image is in `Doc/schematics`; however, due to the sloppy way
 three-wire junctions are made, it may open improperly.
