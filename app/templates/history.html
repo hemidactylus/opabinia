@@ -57,11 +57,14 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th class="col col-sm-6">
+                  <th class="col col-sm-4">
                     Date
                   </th>
                   <th class="col col-sm-2">
                     Max In
+                  </th>
+                  <th class="col col-sm-2">
+                    In hits
                   </th>
                   <th class="col col-sm-2">
                     Hits
@@ -81,6 +84,9 @@
                   </td>
                   <td>
                     {{ histitem.max }}
+                  </td>
+                  <td>
+                    {{ histitem.ins }}
                   </td>
                   <td>
                     {{ histitem.abscount }}

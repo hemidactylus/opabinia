@@ -61,9 +61,10 @@ def timeBounds(datename):
         as utc datetimes
     '''
     if datename=='today':
-        reqDate=datetime.utcnow()
+        reqDate=datetime(*localiseDate(datetime.utcnow()).date().timetuple()[:3]) #datetime.utcnow()
+        print(reqDate)
     elif datename=='yesterday':
-        reqDate=datetime.utcnow()-timedelta(days=1)
+        reqDate=datetime(*localiseDate(datetime.utcnow()-timedelta(days=1)).date().timetuple()[:3])
     else:
         try:
             reqDate=datetime.strptime(datename,dateFormat)

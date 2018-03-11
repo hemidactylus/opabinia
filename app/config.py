@@ -36,7 +36,7 @@ sensorPins=[
 innerSensor=0 # i.e. the R one is the one closer to 'in'
 # sensor response setup
 sensorReadFrequency=0.002           # seconds
-sensorDistanceRange=[0.10,1.20]     # meters: min/max
+sensorDistanceRange=[0.10,0.90]     # meters: min/max
 sensorDebounceTime=0.05             # seconds
 sensorRefractoryTime=2.0            # seconds
 sensorPassageWindow=[0.1,0.8]       # seconds

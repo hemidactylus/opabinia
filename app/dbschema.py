@@ -29,6 +29,7 @@ dbTablesDesc={
             ('count','INTEGER'),
             ('abscount','INTEGER'),
             ('max','INTEGER'),
+            ('ins','INTEGER'),
         ],
         'indices': {
             'history_date_index': [

@@ -32,8 +32,8 @@ The circuit layout is as follows:
 
 <img src="Doc/schematics/opabinia_bb.png" alt="Circuit schematics" width="90%"/>
 
-The Fritzing file for the above image is in `Doc/schematics`; however, due to the sloppy way
-three-wire junctions are made, it may open improperly.
+The Fritzing file for the above image is in `Doc/schematics`; however, due (probably)
+to the sloppy way three-wire junctions are made, it may open improperly.
 
 Moreover, the Fritzing project makes use of a custom part (`HC-SR04.fzpz`)
 for the proximity sensor, which can be obtained
@@ -43,7 +43,7 @@ and imported [here](http://fritzing.org/projects/hc-sr04-project/).
 
 The collected data goes to a sqlite database file: the measurement service, which wraps
 a Python script (that runs as `root`), writes to it when it detects some events through
-the sensors; the web application (running as user `pi`) reads from it and prepares the data
+the sensors; the web application (running as user `pi`) reads from sqlite and prepares the data
 for the web UI.
 
 The web application is a Python Flask application, served by `nginx` through the `uWSGI`
