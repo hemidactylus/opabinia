@@ -1,6 +1,9 @@
 [Unit]
 Description=Opabinia Sensor Engine
-After=network.target
+After=pigpiod.service
+Restart=always
+StartLimitIntervalSec=0
+RestartSec=10
 
 [Service]
 User=root
