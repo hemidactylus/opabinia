@@ -1,11 +1,11 @@
 [Unit]
 Description=Opabinia Sensor Engine
 After=pigpiod.service
-Restart=always
 StartLimitIntervalSec=0
-RestartSec=10
 
 [Service]
+Restart=always
+RestartSec=10
 User=root
 Group=www-data
 WorkingDirectory=/home/pi/web/Opabinia/
