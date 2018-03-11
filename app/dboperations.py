@@ -83,6 +83,8 @@ def integrateRows(db, reqDate, cumulate=True):
     #
     summedKeys={'count','abscount'}
     ini={k:0 for k in summedKeys}
+    insFound=0
+    ini['ins']=insFound
     if cumulate:
         ini['time']=findPreviousMidnight(reqDate)
         results=[ini]
@@ -95,7 +97,6 @@ def integrateRows(db, reqDate, cumulate=True):
                 return cachedDoc
         #
         maxFound=0
-        insFound=0
     #
     whereClause='date = \'%s\'' % reqDate.strftime(dateFormat)
     rowCursor=dbRetrieveAllRecords(db,'counts',whereClause=whereClause)
@@ -105,18 +106,18 @@ def integrateRows(db, reqDate, cumulate=True):
             k: ini.get(k,0)+doc.get(k,0)
             for k in summedKeys
         }
+        insFound=insFound+(1 if doc['count']>0 else 0)
+        ini['ins']=insFound
         if cumulate:
             ini['time']=doc['time']
             results.append(ini)
         else:
-            insFound=insFound+(1 if ini['count']>0 else 0)
             maxFound=max(maxFound,ini['count'])
     if cumulate:
         return results
     else:
         result={k:v for k,v in ini.items()}
         result['max']=maxFound
-        result['ins']=insFound
         result['date']=reqDate
         # cache to 'history' if old enough
         if cacheable:

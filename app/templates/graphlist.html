@@ -65,14 +65,17 @@
                       Hit
                     </th>
                   {% else %}
-                    <th class="col col-sm-4">
+                    <th class="col col-sm-3">
                       Time
                     </th>
-                     <th class="col col-sm-4">
-                      Total Hits
+                    <th class="col col-sm-3">
+                      Total hits
                     </th>
-                    <th class="col col-sm-4">
-                      People In
+                    <th class="col col-sm-3">
+                      In hits
+                    </th>
+                    <th class="col col-sm-3">
+                      People in
                     </th>
                  {% endif %}
                 </tr>
@@ -86,6 +89,9 @@
                   {% if not twocolumns %}
                     <td>
                       {{ ent.abscount }}
+                    </td>
+                    <td>
+                      {{ ent.ins }}
                     </td>
                   {% endif %}
                   <td>
