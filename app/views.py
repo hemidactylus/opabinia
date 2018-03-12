@@ -22,6 +22,7 @@ from app.config import (
     timeZone,
     dateFormat,
     niceDateFormat,
+    fileNameDateFormat,
 )
 
 from app.dboperations import (
@@ -40,9 +41,12 @@ from dateutils import (
     timeBounds,
     normaliseReqDate,
     monthNames,
+    sortAndLocalise,
 )
 
 from dictutils import makeDateListToTree
+
+from spreadsheets import makeSpreadsheet
 
 @app.route('/')
 @app.route('/counters')
@@ -50,16 +54,11 @@ from dictutils import makeDateListToTree
 def ep_counters(date='today'):
     db=dbOpenDatabase(dbName)
     queryDate,lastMidnight=timeBounds(date)
-    entries=sorted(
-        [
-            localiseRow(row)
-            for row in integrateRows(
-                db,
-                queryDate,
-            )
-        ],
-        key=lambda evt: evt['time'],
-        reverse=True,
+    entries=sortAndLocalise(
+        integrateRows(
+            db,
+            queryDate,
+        )
     )
     reqdate=normaliseReqDate(date)
     return render_template(
@@ -81,21 +80,12 @@ def ep_counters(date='today'):
 def ep_events(date='today'):
     db=dbOpenDatabase(dbName)
     queryDate,lastMidnight=timeBounds(date)
-    entries=sorted(
-        [
-            locRow
-            for locRow in (
-                localiseRow(row)
-                for row in dbGetRows(
-                    db,
-                    queryDate
-                )
-            )
-        ],
-        key=lambda evt: evt['time'],
-        reverse=True,
+    entries=sortAndLocalise(
+        dbGetRows(
+            db,
+            queryDate
+        )
     )
-    #
     reqdate=normaliseReqDate(date)
     return render_template(
       "graphlist.html",
@@ -178,10 +168,31 @@ def ep_chooseday(target='counters'):
 
 @app.route('/download_history')
 def ep_download_history():
-    from spreadsheets import testSpreadsheet
-    spd = testSpreadsheet()
+    db=dbOpenDatabase(dbName)
+    now=localiseDate(datetime.utcnow())
+    # 1. history
+    dates=dbGetDateList(db,startDate=None)
+    history={
+        d: integrateRows(db,d,cumulate=False)
+        for d in dates
+    }
+    # 2. daily detail
+    dates=dbGetDateList(db)
+    perDay={
+        tDate: sortAndLocalise(
+            integrateRows(
+                db,
+                datetime(*tDate.timetuple()[:3]),
+            )
+        )
+        for tDate in dates
+    }
+    #
+    spreadsheet = makeSpreadsheet(history=history,perDay=perDay,now=now)
+    #
+    spreadsheetFilename='history_%s.xlsx' % now.strftime(fileNameDateFormat)
     return send_file (
-        spd,
-        attachment_filename='test.xlsx',
+        spreadsheet,
+        attachment_filename=spreadsheetFilename,
         as_attachment=True,
     )

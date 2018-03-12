@@ -13,6 +13,7 @@ timeZone='Europe/Rome'
 
 dateFormat='%Y-%m-%d'
 niceDateFormat='%B %d, %Y'
+fileNameDateFormat='%Y_%m_%d_%H_%M_%S'
 
 # UI settings
 defaultHoursBack=8

@@ -84,3 +84,13 @@ def normaliseReqDate(rdate):
         if rdate==possibleName or timeBounds(possibleName)[0].strftime(dateFormat)==rdate:
           return possibleName
     return rdate
+
+def sortAndLocalise(evtList):
+    return sorted(
+        (
+            localiseRow(evt)
+            for evt in evtList
+        ),
+        key=lambda evt: evt['time'],
+        reverse=True,
+    )
