@@ -190,9 +190,11 @@ def ep_download_history():
     #
     spreadsheet = makeSpreadsheet(history=history,perDay=perDay,now=now)
     #
-    spreadsheetFilename='history_%s.xlsx' % now.strftime(fileNameDateFormat)
+    spreadsheetFilename='opabinia_history_%s.xlsx' % now.strftime(fileNameDateFormat)
     return send_file (
         spreadsheet,
         attachment_filename=spreadsheetFilename,
         as_attachment=True,
+        last_modified=now,
+        cache_timeout=0,
     )
