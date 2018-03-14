@@ -38,19 +38,20 @@
       </div>
 
       <div class="row">
-        <div class="col-md-12" style="text-align: center; margin-top: 20px;">
+        <div class="col-md-12" style="text-align: center; margin-top: 20px; margin-bottom: 10px;">
           {{ text }}
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-8 col-sm-6">
-          <p>
-              (here the plot should be)
-          </p>
-          <p>
-            <img src="/static/images/opabinia.png" width="80%">
-          </p>
+
+          <svg class="chart" viewBox="0 0 600 360" preserveAspectRatio="none"></svg>
+          <script>
+            var reqDate = "{{reqdate}}";
+          </script>
+          <script src="/static/d3/d3.min.js" charset="utf-8"></script>
+          <script src="/static/plots/plots.js" charset="utf-8"></script>
         </div>
         <div class="col-md-4 col-sm-6" style="margin-bottom: 80px;">
           <div style="overflow: auto; height: 400px;">

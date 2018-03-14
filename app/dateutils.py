@@ -5,6 +5,7 @@
 
 import pytz
 from datetime import datetime, timedelta
+import time
 
 from config import (
     timeZone,
@@ -48,7 +49,16 @@ def localiseRow(row):
     nrow=row
     if nrow['time'] is not None:
         nrow['time']=localiseDate(row['time'])
+        nrow['jtimestamp']=time.mktime(nrow['time'].timetuple())*1000.0
     return nrow
+def jtimestampLatest(dpoints):
+    latest=max(dpoints,key=lambda dp: dp['time'])['time']
+    locNow=localiseDate(datetime.now())
+    if latest+timedelta(hours=1) > locNow:
+        finalpoint=locNow
+    else:
+        finalpoint=latest+timedelta(hours=1)
+    return time.mktime((finalpoint).timetuple())*1000.0
 
 def timeBounds(datename):
     '''

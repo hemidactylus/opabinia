@@ -11,6 +11,7 @@ from flask import   (
     g,
     send_file,
     send_from_directory,
+    jsonify,
 )
 
 from datetime import datetime, timedelta
@@ -42,6 +43,7 @@ from dateutils import (
     normaliseReqDate,
     monthNames,
     sortAndLocalise,
+    jtimestampLatest,
 )
 
 from dictutils import makeDateListToTree
@@ -73,6 +75,24 @@ def ep_counters(date='today'):
       entries=entries,
       cdtarget='counters',
       niceDateFormat=niceDateFormat,
+    )
+
+@app.route('/datacounters')
+@app.route('/datacounters/<date>')
+def ep_datacounters(date='today'):
+    db=dbOpenDatabase(dbName)
+    queryDate,lastMidnight=timeBounds(date)
+    dataPoints=sortAndLocalise(
+        integrateRows(
+            db,
+            queryDate,
+        )
+    )
+    return jsonify(
+        {
+            'points': dataPoints,
+            'now': jtimestampLatest(dataPoints),
+        }
     )
 
 @app.route('/events')
