@@ -87,6 +87,7 @@ def integrateRows(db, reqDate, cumulate=True):
     ini['ins']=insFound
     if cumulate:
         ini['time']=findPreviousMidnight(reqDate)
+        ini['sign']=0
         results=[ini]
     else:
         # check if on cache
@@ -110,6 +111,7 @@ def integrateRows(db, reqDate, cumulate=True):
         ini['ins']=insFound
         if cumulate:
             ini['time']=doc['time']
+            ini['sign']=doc['count']
             results.append(ini)
         else:
             maxFound=max(maxFound,ini['count'])

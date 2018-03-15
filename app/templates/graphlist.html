@@ -6,7 +6,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12" style="text-align: center;">
-          <h2> {{ pagetype }} for {{ queryDate.strftime(niceDateFormat) }} </h2>
+          <h2> {{ pagetitle }} for {{ queryDate.strftime(niceDateFormat) }} </h2>
         </div>
       </div>
 
@@ -44,21 +44,22 @@
       </div>
 
       <div class="row">
-        <div class="col-md-8 col-sm-6">
+        <div class="col-md-7 col-sm-6">
 
-          <svg class="chart" viewBox="0 0 600 360" preserveAspectRatio="none"></svg>
+          <svg class="chart" viewBox="0 0 600 330" preserveAspectRatio="none"></svg>
           <script>
             var reqDate = "{{reqdate}}";
+            var plotType= "{{pagetype}}";
           </script>
           <script src="/static/d3/d3.min.js" charset="utf-8"></script>
           <script src="/static/plots/plots.js" charset="utf-8"></script>
         </div>
-        <div class="col-md-4 col-sm-6" style="margin-bottom: 80px;">
+        <div class="col-md-5 col-sm-6" style="margin-bottom: 80px;">
           <div style="overflow: auto; height: 400px;">
             <table class="table table-hover">
               <thead>
                 <tr>
-                  {% if twocolumns %}
+                  {% if pagetype == 'Hits' %}
                     <th class="col col-sm-6">
                       Time
                     </th>
@@ -69,14 +70,17 @@
                     <th class="col col-sm-3">
                       Time
                     </th>
-                    <th class="col col-sm-3">
-                      Total hits
+                    <th class="col col-sm-2">
+                      Hits
                     </th>
-                    <th class="col col-sm-3">
+                    <th class="col col-sm-2">
                       In hits
                     </th>
                     <th class="col col-sm-3">
                       People in
+                    </th>
+                    <th class="col col-sm-2">
+                      Sign
                     </th>
                  {% endif %}
                 </tr>
@@ -87,7 +91,7 @@
                   <td>
                     {{ ent.time.strftime('%H:%M:%S') }}
                   </td>
-                  {% if not twocolumns %}
+                  {% if pagetype != 'Hits' %}
                     <td>
                       {{ ent.abscount }}
                     </td>
@@ -104,6 +108,23 @@
                       </span>
                     {% endif %}
                   </td>
+                  {% if pagetype != 'Hits' %}
+                    <td>
+                      {% if ent.sign < 0 %}
+                        <span style="color: cyan; font-weight: bold;">
+                          &#x21D7;
+                        </span>
+                      {% elif ent.sign > 0 %}
+                        <span style="color: red; font-weight: bold;">
+                          &#x2198;
+                        </span>
+                      {% else %}
+                        <span style="color: grey;">
+                          &#x2501;
+                        </span>
+                      {% endif %}
+                    </td>
+                  {% endif %}
                 </tr>
               {% endfor %}
               </tbody>
