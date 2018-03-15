@@ -43,8 +43,8 @@
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
               <li class="active">
-                {% if reqdate %}
-                  <a href="{{ url_for('ep_counters',date=reqdate) }}">
+                {% if reqDate %}
+                  <a href="{{ url_for('ep_counters',date=reqDate) }}">
                 {% else %}
                   <a href="{{ url_for('ep_counters') }}">
                 {% endif %}
@@ -53,8 +53,8 @@
                 </a>
               </li>
               <li>
-                {% if reqdate %}
-                  <a href="{{ url_for('ep_events',date=reqdate) }}">
+                {% if reqDate %}
+                  <a href="{{ url_for('ep_events',date=reqDate) }}">
                 {% else %}
                   <a href="{{ url_for('ep_events') }}">
                 {% endif %}

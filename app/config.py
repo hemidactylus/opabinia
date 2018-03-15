@@ -15,6 +15,9 @@ dateFormat='%Y-%m-%d'
 niceDateFormat='%B %d, %Y'
 fileNameDateFormat='%Y_%m_%d_%H_%M_%S'
 
+# web app settings
+barSeconds=30*60 # for the histogram on 'Flux' page
+
 # UI settings
 defaultHoursBack=8
 recentnessTimeSpan=timedelta(hours=defaultHoursBack)

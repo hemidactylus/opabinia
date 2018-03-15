@@ -1,4 +1,4 @@
-from time import time
+import time
 import pytz
 
 from flask import   (
@@ -24,6 +24,7 @@ from app.config import (
     dateFormat,
     niceDateFormat,
     fileNameDateFormat,
+    barSeconds,
 )
 
 from app.dboperations import (
@@ -44,6 +45,8 @@ from dateutils import (
     monthNames,
     sortAndLocalise,
     jtimestampLatest,
+    roundTime,
+    timeHistogram,
 )
 
 from dictutils import makeDateListToTree
@@ -62,15 +65,17 @@ def ep_counters(date='today'):
             queryDate,
         )
     )
-    reqdate=normaliseReqDate(date)
+    reqDate=normaliseReqDate(date)
+    reqUrl=url_for('ep_datacounters',date=reqDate)
     return render_template(
       "graphlist.html",
       text='Entries: %i' % (len(entries)),
       pagetype='Counts',
       pagetitle='Counts',
       baseurl=url_for('ep_counters'),
+      reqUrl=reqUrl,
       queryDate=queryDate,
-      reqdate=reqdate,
+      reqDate=reqDate,
       entries=entries,
       cdtarget='counters',
       niceDateFormat=niceDateFormat,
@@ -105,18 +110,40 @@ def ep_events(date='today'):
             queryDate
         )
     )
-    reqdate=normaliseReqDate(date)
+    histo=timeHistogram(entries,barSeconds=barSeconds)
+    reqDate=normaliseReqDate(date)
+    reqUrl=url_for('ep_dataevents',date=reqDate)
     return render_template(
       "graphlist.html",
-      text='Entries: %i' % (len(entries)),
+      text='(each bar spans %.2f minutes)' % (barSeconds/60.0),
       pagetype='Hits',
       pagetitle='Flux',
       baseurl=url_for('ep_events'),
-      reqdate=reqdate,
+      reqUrl=reqUrl,
+      reqDate=reqDate,
       queryDate=queryDate,
-      entries=entries,
+      entries=histo,
       cdtarget='events',
       niceDateFormat=niceDateFormat,
+    )
+
+@app.route('/dataevents')
+@app.route('/dataevents/<date>')
+def ep_dataevents(date='today'):
+    db=dbOpenDatabase(dbName)
+    queryDate,lastMidnight=timeBounds(date)
+    entries=sortAndLocalise(
+        dbGetRows(
+            db,
+            queryDate
+        )
+    )
+    histo=timeHistogram(entries,barSeconds=barSeconds)
+    return jsonify(
+        {
+            'histogram': histo,
+            'now': time.mktime((datetime.now()).timetuple())*1000.0,
+        }
     )
 
 @app.route('/history')

@@ -15,13 +15,13 @@
           <div class="row">
             <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/today"
-                 class="btn btn-sm btn-primary {%- if reqdate=='today' -%} active {%- endif -%}" style="width: 100%;">
+                 class="btn btn-sm btn-primary {%- if reqDate=='today' -%} active {%- endif -%}" style="width: 100%;">
                 Today
               </a>
             </div>
             <div class="col-md-3 col-sm-3">
               <a href="{{ baseurl }}/yesterday"
-                 class="btn btn-sm btn-primary {%- if reqdate=='yesterday' -%} active {%- endif -%}" style="width: 100%;">
+                 class="btn btn-sm btn-primary {%- if reqDate=='yesterday' -%} active {%- endif -%}" style="width: 100%;">
                 Yesterday
               </a>
             </div>
@@ -50,6 +50,7 @@
           <script>
             var reqDate = "{{reqdate}}";
             var plotType= "{{pagetype}}";
+            var reqUrl = "{{ reqUrl }}"
           </script>
           <script src="/static/d3/d3.min.js" charset="utf-8"></script>
           <script src="/static/plots/plots.js" charset="utf-8"></script>
@@ -63,8 +64,11 @@
                     <th class="col col-sm-6">
                       Time
                     </th>
-                    <th class="col col-sm-6">
-                      Hit
+                    <th class="col col-sm-3">
+                      Influx
+                    </th>
+                    <th class="col col-sm-3">
+                      Outflux
                     </th>
                   {% else %}
                     <th class="col col-sm-3">
@@ -87,28 +91,26 @@
               </thead>
               <tbody>
               {% for ent in entries %}
-                <tr>
-                  <td>
-                    {{ ent.time.strftime('%H:%M:%S') }}
-                  </td>
-                  {% if pagetype != 'Hits' %}
+                {% if pagetype != 'Hits' %}
+                  <tr>
+                    <td>
+                      {{ ent.time.strftime('%H:%M:%S') }}
+                    </td>
                     <td>
                       {{ ent.abscount }}
                     </td>
                     <td>
                       {{ ent.ins }}
                     </td>
-                  {% endif %}
-                  <td>
-                    {% if ent.count < 0 %}
-                      <span style="color: red; font-weight: bold;">
-                    {% endif %}
-                      {{ "%+i" % ent.count }}
-                    {% if ent.count < 0 %}
-                      </span>
-                    {% endif %}
-                  </td>
-                  {% if pagetype != 'Hits' %}
+                    <td>
+                      {% if ent.count < 0 %}
+                        <span style="color: red; font-weight: bold;">
+                      {% endif %}
+                        {{ "%+i" % ent.count }}
+                      {% if ent.count < 0 %}
+                        </span>
+                      {% endif %}
+                    </td>
                     <td>
                       {% if ent.sign < 0 %}
                         <span style="color: cyan; font-weight: bold;">
@@ -124,8 +126,26 @@
                         </span>
                       {% endif %}
                     </td>
-                  {% endif %}
-                </tr>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td>
+                      {{ ent.time.strftime('%H:%M:%S') }}
+                    </td>
+                    <td>
+                      <span style="color: cyan;
+                          {% if ent.ins > 0 %} font-weight: bold {% else %} font-size: 80% {% endif %};">
+                        {{ ent.ins }}
+                      </span>
+                    </td>
+                    <td>
+                      <span style="color: red;
+                          {% if ent.outs > 0 %} font-weight: bold {% else %} font-size: 80% {% endif %};">
+                        {{ ent.outs }}
+                      </span>
+                    </td>
+                  </tr>
+                {% endif %}
               {% endfor %}
               </tbody>
             </table>
