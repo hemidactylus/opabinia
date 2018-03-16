@@ -1,7 +1,7 @@
 // CONSTANTS
 var minBarHeight = 4; // min height of the plot line
 var zeroAxisHeight=1;
-var zeroAxisColor="black";
+var zeroAxisColor="#006000";
 
 var gwidth=600;       // viewport size of the svg
 var gheight=330;      // (these must match the size on the html!)
@@ -11,12 +11,19 @@ var margin = {top: 20, right: 30, bottom: 40, left: 50},
     width = gwidth - margin.left - margin.right,
     height = gheight - margin.top - margin.bottom;
 
+//
+var fullDay=1000.0*86400;
+
 // in-plot gutters
 var fpGutter=3600000; // space between plotted lines and plot area, horiz.
 var xGutter=180000;   // 
 var lineYGutter=3;
 var histoYGutter=1;
-var histoXGutterFrac=0.14; // fraction of the full-bar-width to leave empty (sum of the sides)
+var histogramXGap=0.14; // fraction of the full-bar-width to leave empty (sum of the sides)
+
+var historyXGutter=0.5*fullDay;
+var historyYGutter = 2;
+var historyBarGap=0.14;
 
 // curves to plot
 var curves=[
@@ -49,6 +56,13 @@ var formatTime=function(tstamp){
   // Will return time in 10:30:23 format
   return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 }
+var formatDate=function(tstamp){
+  var date = new Date(tstamp);
+  var year = date.getFullYear();
+  var month = "0" + (date.getMonth()+1);
+  var day = "0" + date.getDate();
+  return year + '/' + month.substr(-2) + '/' + day.substr(-2);
+}
 var formatTimeInterval=function(tstamp,span){
   var t2=span+tstamp
   return formatTime(tstamp)+" - "+formatTime(t2);
@@ -73,6 +87,17 @@ var addAxisLabels = function(elem,xlabel,ylabel) {
     .text(ylabel);
 }
 
+var displayMessage = function(elem,msg) {
+  var msgBox=elem.append("g")
+  var msgText=msgBox
+    .append("text")
+    .text(msg);
+  var tx=0.5*(width-msgText.node().getBBox().width);
+  var ty=0.5*(height-msgText.node().getBBox().height);
+  msgBox
+    .attr("transform","translate("+tx+","+ty+")");
+}
+
 // creation and resizing of the plot window
 var chart = d3.select(".chart")
   // these four are the only one on the actual SVG (outside of a viewbox)
@@ -90,14 +115,7 @@ var chartBody = chart.append("g")
 
 d3.json(reqUrl,function(error,data){
   if(error != undefined){
-    var errg=chartBody.append("g")
-    var errt=errg
-      .append("text")
-      .text("An error occurred.");
-    var tx=0.5*(width-errt.node().getBBox().width);
-    var ty=0.5*(height-errt.node().getBBox().height);
-    errg
-      .attr("transform","translate("+tx+","+ty+")");
+    displayMessage(chartBody,"An error occurred.");
   } else {
 
     var y = d3.scaleLinear()
@@ -116,26 +134,91 @@ d3.json(reqUrl,function(error,data){
       .attr("transform", "translate(0,0)");
 
     if (plotType == "History") {
-     var errg=chartBody.append("g")
-      var errt=errg
-        .append("text")
-        .text("Plot not supported.");
-      var tx=0.5*(width-errt.node().getBBox().width);
-      var ty=0.5*(height-errt.node().getBBox().height);
-      errg
-        .attr("transform","translate("+tx+","+ty+")");
+      plotData=data.history;
+      if (plotData.length<1) {
+        displayMessage(chartBody,"No data to plot.")
+      } else {
+        console.log(plotData);
+        // a quadruplet of histo bars per each day
+        addAxisLabels(chartBody,"Day","Counts");
+        var time_min=d3.min(plotData.map( function(d){return d.jtimestamp;} ));
+        var time_max=d3.max(plotData.map( function(d){return d.jtimestamp;} ));
+        var time_extent=time_max-time_min;
+        var y_max=d3.max(plotData.map(
+          function(d) {return d3.max([d.abscount,d.count,d.ins,d.max]);}
+        ));
+        var y_min=d3.min(plotData.map(
+          function(d) {return d3.min([d.abscount,d.count,d.ins,d.max]);}
+        ));
+        var y_extent=(y_max-y_min);
+        y.domain([y_max,y_min]);
+        x.domain([time_min-historyXGutter-0.5*fullDay, time_max+historyXGutter+0.5*fullDay]);
+        var barsWidth=(1-historyBarGap)*(x(time_max)-x(time_min))/(1.0*plotData.length-1.0);
+        var barsLeftGap=(0.5*historyBarGap)*(x(time_extent)-x(0))/(1.0*plotData.length-1);
+        //
+        histories=[
+          {
+            'name': 'max',
+            'color': 'black',
+            'index': 0,
+            'title': 'Max in'
+          },
+          {
+            'name': 'ins',
+            'color': 'cyan',
+            'index': 1,
+            'title': 'In hits'
+          },
+          {
+            'name': 'abscount',
+            'color': '#C0C0C0',
+            'index': 2,
+            'title': 'Hits'
+          },
+          {
+            'name': 'count',
+            'color': 'red',
+            'index': 3,
+            'title': 'Bias'
+          }
+        ];
+        chartBody
+          .append("g")
+          .attr("transform","translate("+x(time_min-0.5*fullDay-historyXGutter)+","+(y(0)-0.5*zeroAxisHeight)+")")
+          .append("rect")
+          .attr("width",x(time_max+0.5*fullDay+historyXGutter)-x(time_min-0.5*fullDay-historyXGutter))
+          .attr("height",zeroAxisHeight)
+          .attr("fill",zeroAxisColor);
+        //
+        for (ihistory=0;ihistory<histories.length;ihistory++){
+          tHistory=histories[ihistory];
+          histoMaxInSel=chartBody.selectAll("."+tHistory.name+" g").data(plotData);
+          histoMaxInBars=histoMaxInSel
+              .enter()
+              .append("g")
+              .attr("transform", function(d) {
+                return "translate("+(x(d.jtimestamp-0.5*fullDay)+(ihistory*barsWidth/4.0)+barsLeftGap)
+                  +","+(y(d[tHistory.name])-y(y_max))+")";
+              } );
+          histoMaxInBars.append("rect")
+              // .attr("class","lineclass")
+              .style("fill",tHistory.color)
+              .attr("width",function(d) {return 0.25*barsWidth;})
+              .attr("height",function(d) { return y(0)-y(d[tHistory.name]); })
+              .attr("fill-opacity",0.66);
+          histoMaxInBars.append("title")
+              .text(function(d) { return  formatDate(d.jtimestamp) + ": "+tHistory.title+" " + d[tHistory.name]; });
+        }
+
+        xaxis.call(xAxis);
+        yaxis.call(yAxis);
+
+      }
   } else if (plotType == "Hits") {
       var plotData=data.histogram;
       console.log(plotData);
       if (plotData.length<1) {
-        var errg=chartBody.append("g")
-        var errt=errg
-          .append("text")
-          .text("No data to plot.");
-        var tx=0.5*(width-errt.node().getBBox().width);
-        var ty=0.5*(height-errt.node().getBBox().height);
-        errg
-          .attr("transform","translate("+tx+","+ty+")");
+        displayMessage(chartBody,"No data to plot.");
       } else {
         // double histogram for hits
         var tSpan=plotData[0].span;
@@ -166,13 +249,13 @@ d3.json(reqUrl,function(error,data){
             .enter()
             .append("g")
             .attr("transform", function(d) {
-              return "translate("+x(d.jtimestamp-(0.5-0.5*histoXGutterFrac)*tSpan)
+              return "translate("+x(d.jtimestamp-(0.5-0.5*histogramXGap)*tSpan)
                 +","+y(0)+")";
             } );
         cbars.append("rect")
             // .attr("class","lineclass")
             .style("fill","red")
-            .attr("width",function(d) {return width*((1-histoXGutterFrac)*d.span/time_extent);})
+            .attr("width",function(d) {return width*((1-histogramXGap)*d.span/time_extent);})
             .attr("height",function(d) { return y(0)-y(d.outs); })
             .attr("fill-opacity",0.66);
         cbars.append("title")
@@ -183,13 +266,13 @@ d3.json(reqUrl,function(error,data){
             .enter()
             .append("g")
             .attr("transform", function(d) {
-              return "translate("+x(d.jtimestamp-(0.5-0.5*histoXGutterFrac)*tSpan)
+              return "translate("+x(d.jtimestamp-(0.5-0.5*histogramXGap)*tSpan)
                 +","+(y(d.ins)-y(abs_y_max+histoYGutter))+")";
             } );
         cbars.append("rect")
             // .attr("class","lineclass")
             .style("fill","cyan")
-            .attr("width",function(d) {return width*((1-histoXGutterFrac)*d.span/time_extent);})
+            .attr("width",function(d) {return width*((1-histogramXGap)*d.span/time_extent);})
             .attr("height",function(d) { return y(0)-y(d.ins); })
             .attr("fill-opacity",0.66);
         cbars.append("title")
@@ -201,14 +284,7 @@ d3.json(reqUrl,function(error,data){
       }
     } else { // plotType == 'Counts'
       if (data.points.length<2) {
-        var errg=chartBody.append("g")
-        var errt=errg
-          .append("text")
-          .text("No data to plot.");
-        var tx=0.5*(width-errt.node().getBBox().width);
-        var ty=0.5*(height-errt.node().getBBox().height);
-        errg
-          .attr("transform","translate("+tx+","+ty+")");
+        displayMessage(chartBody,"No data to plot.");
       } else {
         // restrict the range to the time of interest (depends on data!)
         var plotData=data.points.reverse()

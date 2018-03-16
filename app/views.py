@@ -188,7 +188,7 @@ def jHistorizer(hItem):
         k: hItem[k]
         for k in ['count','ins','abscount','max']
     }
-    nDict['time']=time.mktime(hItem['date'].timetuple())*1000.0
+    nDict['jtimestamp']=time.mktime(hItem['date'].timetuple())*1000.0
     return nDict
 
 @app.route('/datahistory')
