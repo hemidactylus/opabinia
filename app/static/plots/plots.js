@@ -16,6 +16,7 @@ var fpGutter=3600000; // space between plotted lines and plot area, horiz.
 var xGutter=180000;   // 
 var lineYGutter=3;
 var histoYGutter=1;
+var histoXGutterFrac=0.14; // fraction of the full-bar-width to leave empty (sum of the sides)
 
 // curves to plot
 var curves=[
@@ -155,12 +156,14 @@ d3.json(reqUrl,function(error,data){
         cbars=cbarsel
             .enter()
             .append("g")
-            .attr("transform", function(d) {return "translate("+x(d.jtimestamp-0.5*tSpan)
-              +","+y(0)+")"; } );
+            .attr("transform", function(d) {
+              return "translate("+x(d.jtimestamp-(0.5-0.5*histoXGutterFrac)*tSpan)
+                +","+y(0)+")";
+            } );
         cbars.append("rect")
             // .attr("class","lineclass")
             .style("fill","red")
-            .attr("width",function(d) {return width*(d.span/time_extent);})
+            .attr("width",function(d) {return width*((1-histoXGutterFrac)*d.span/time_extent);})
             .attr("height",function(d) { return y(0)-y(-d.outs); })
             .attr("fill-opacity",0.66);
         cbars.append("title")
@@ -170,12 +173,14 @@ d3.json(reqUrl,function(error,data){
         cbars=cbarsel
             .enter()
             .append("g")
-            .attr("transform", function(d) {return "translate("+x(d.jtimestamp-0.5*tSpan)
-              +","+(y(abs_y_max+histoYGutter)-y(d.ins))+")"; } );
+            .attr("transform", function(d) {
+              return "translate("+x(d.jtimestamp-(0.5-0.5*histoXGutterFrac)*tSpan)
+                +","+(y(abs_y_max+histoYGutter)-y(d.ins))+")";
+            } );
         cbars.append("rect")
             // .attr("class","lineclass")
             .style("fill","cyan")
-            .attr("width",function(d) {return width*(d.span/time_extent);})
+            .attr("width",function(d) {return width*((1-histoXGutterFrac)*d.span/time_extent);})
             .attr("height",function(d) { return y(d.ins)-y(0); })
             .attr("fill-opacity",0.66);
         cbars.append("title")

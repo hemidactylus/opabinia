@@ -132,36 +132,39 @@ def timeHistogram(evtList,barSeconds):
         a histogram of pairs of values is prepared
         along time, with a given quantisation
     '''
-    maxTime=roundTime(
-        max(ev['time'] for ev in evtList),
-        barSeconds,
-    )
-    minTime=roundTime(
-        min(ev['time'] for ev in evtList),
-        barSeconds,
-    )
-    numDates=int((maxTime-minTime).total_seconds()/barSeconds)
-    allDates=[
-        minTime+timedelta(seconds=i*barSeconds)
-        for i in range(numDates+1)
-    ]
-    histo={
-        tDate : {
-            'time': tDate,
-            'jtimestamp': time.mktime(tDate.timetuple())*1000.0,
-            'ins': 0,
-            'outs': 0,
-            'span': 1000.0*barSeconds,
+    if len(evtList)==0:
+        return []
+    else:
+        maxTime=roundTime(
+            max(ev['time'] for ev in evtList),
+            barSeconds,
+        )
+        minTime=roundTime(
+            min(ev['time'] for ev in evtList),
+            barSeconds,
+        )
+        numDates=int((maxTime-minTime).total_seconds()/barSeconds)
+        allDates=[
+            minTime+timedelta(seconds=i*barSeconds)
+            for i in range(numDates+1)
+        ]
+        histo={
+            tDate : {
+                'time': tDate,
+                'jtimestamp': time.mktime(tDate.timetuple())*1000.0,
+                'ins': 0,
+                'outs': 0,
+                'span': 1000.0*barSeconds,
+            }
+            for tDate in allDates
         }
-        for tDate in allDates
-    }
-    for evt in evtList:
-        qDate=roundTime(evt['time'],barSeconds)
-        if evt['count']>0:
-            histo[qDate]['ins']+=1
-        elif evt['count']<0:
-            histo[qDate]['outs']+=1
-    return sorted(
-        histo.values(),
-        key=lambda hData: hData['time']
-    )
+        for evt in evtList:
+            qDate=roundTime(evt['time'],barSeconds)
+            if evt['count']>0:
+                histo[qDate]['ins']+=1
+            elif evt['count']<0:
+                histo[qDate]['outs']+=1
+        return sorted(
+            histo.values(),
+            key=lambda hData: hData['time']
+        )
