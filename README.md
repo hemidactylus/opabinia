@@ -42,7 +42,7 @@ and imported [here](http://fritzing.org/projects/hc-sr04-project/).
 ### Software components
 
 The collected data goes to a sqlite database file: the measurement service, which wraps
-a Python script (that runs as `root`), writes to it when it detects some events through
+a Python (2.7) script (that runs as `root`), writes to it when it detects some events through
 the sensors; the web application (running as user `pi`) reads from sqlite and prepares the data
 for the web UI.
 
@@ -122,7 +122,9 @@ to the `authorized_keys` file on the RPi.
 Now update the RPi system and install some needed software. _Disclaimer_: no virtualenvs
 are used in the Python part of Opabinia. This, although a bit contrary to a general sense
 of tidiness, avoids a bit of hassle withouth much collateral damage,
-considering this machine will probably be dedicated to Opabinia.
+considering this machine will probably be dedicated to Opabinia. However, for running and testing on PC
+a `requirements.txt` file is provided (which obviously will not include the `pigpio` component:
+to emulate the behaviour of the measurement part the script `app/mockMeasurer.py` is provided).
 
     sudo apt-get update
     sudo apt-get upgrade
