@@ -115,7 +115,16 @@ d3.json(reqUrl,function(error,data){
       .attr("class", "y axis")
       .attr("transform", "translate(0,0)");
 
-    if (plotType == "Hits") {
+    if (plotType == "History") {
+     var errg=chartBody.append("g")
+      var errt=errg
+        .append("text")
+        .text("Plot not supported.");
+      var tx=0.5*(width-errt.node().getBBox().width);
+      var ty=0.5*(height-errt.node().getBBox().height);
+      errg
+        .attr("transform","translate("+tx+","+ty+")");
+  } else if (plotType == "Hits") {
       var plotData=data.histogram;
       console.log(plotData);
       if (plotData.length<1) {
@@ -139,7 +148,7 @@ d3.json(reqUrl,function(error,data){
           function(d){return d3.max([Math.abs(d.ins),Math.abs(d.outs)]);}
         ));
         //
-        y.domain([-abs_y_max-histoYGutter,abs_y_max+histoYGutter]);
+        y.domain([abs_y_max+histoYGutter,-abs_y_max-histoYGutter]);
         var y_extent = 2*(abs_y_max+histoYGutter);
         x.domain([time_min-0.5*tSpan,time_max+0.5*tSpan]);
         var barHeight=minBarHeight;
@@ -164,7 +173,7 @@ d3.json(reqUrl,function(error,data){
             // .attr("class","lineclass")
             .style("fill","red")
             .attr("width",function(d) {return width*((1-histoXGutterFrac)*d.span/time_extent);})
-            .attr("height",function(d) { return y(0)-y(-d.outs); })
+            .attr("height",function(d) { return y(0)-y(d.outs); })
             .attr("fill-opacity",0.66);
         cbars.append("title")
             .text(function(d) { return  formatTime(d.jtimestamp) + ": outflux " + d.outs; });
@@ -175,13 +184,13 @@ d3.json(reqUrl,function(error,data){
             .append("g")
             .attr("transform", function(d) {
               return "translate("+x(d.jtimestamp-(0.5-0.5*histoXGutterFrac)*tSpan)
-                +","+(y(abs_y_max+histoYGutter)-y(d.ins))+")";
+                +","+(y(d.ins)-y(abs_y_max+histoYGutter))+")";
             } );
         cbars.append("rect")
             // .attr("class","lineclass")
             .style("fill","cyan")
             .attr("width",function(d) {return width*((1-histoXGutterFrac)*d.span/time_extent);})
-            .attr("height",function(d) { return y(d.ins)-y(0); })
+            .attr("height",function(d) { return y(0)-y(d.ins); })
             .attr("fill-opacity",0.66);
         cbars.append("title")
             .text(function(d) { return  formatTime(d.jtimestamp) + ": influx " + d.ins; });

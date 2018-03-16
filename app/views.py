@@ -164,6 +164,8 @@ def ep_history(daysback='7'):
     else:
         firstDate=None
     #
+    reqUrl=url_for('ep_datahistory',daysback=daysback)
+    #
     dates=dbGetDateList(db,startDate=firstDate)
     history={
         d: integrateRows(db,d,cumulate=False)
@@ -176,6 +178,49 @@ def ep_history(daysback='7'):
         daysback=daysback,
         dateFormat=dateFormat,
         niceDateFormat=niceDateFormat,
+        reqDate=daysback,
+        pagetype='History',
+        reqUrl=reqUrl,
+    )
+
+def jHistorizer(hItem):
+    nDict={
+        k: hItem[k]
+        for k in ['count','ins','abscount','max']
+    }
+    nDict['time']=time.mktime(hItem['date'].timetuple())*1000.0
+    return nDict
+
+@app.route('/datahistory')
+@app.route('/datahistory/<daysback>')
+def ep_datahistory(daysback='7'):
+    db=dbOpenDatabase(dbName)
+    if daysback!='forever':
+        try:
+            dbackInt=int(daysback)
+            firstDate=findPreviousMidnight(datetime.utcnow())-timedelta(days=dbackInt-2)
+        except:
+            firstDate=None
+    else:
+        firstDate=None
+    dates=dbGetDateList(db,startDate=firstDate)
+    history={
+        d: integrateRows(db,d,cumulate=False)
+        for d in dates
+    }
+    #
+    jhistory=[
+        jHistorizer(itm)
+        for itm in sorted(
+            history.values(),
+            key=lambda hIt: hIt['date'],
+        )
+    ]
+    return jsonify(
+        {
+            'history': jhistory,
+            'now': time.mktime((datetime.now()).timetuple())*1000.0,
+        }
     )
 
 @app.route('/about')
