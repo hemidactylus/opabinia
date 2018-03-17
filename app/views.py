@@ -228,6 +228,7 @@ def ep_about():
     return render_template(
         'about.html',
         pagetitle='About Opabinia',
+        pagetype='About',
     )
 
 @app.route('/chooseday')

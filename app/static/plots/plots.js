@@ -1,6 +1,6 @@
 // CONSTANTS
 var minBarHeight = 4; // min height of the plot line
-var zeroAxisHeight=1;
+var zeroAxisHeight=2; // height of the line marking the zero axis
 var zeroAxisColor="#006000";
 
 var gwidth=600;       // viewport size of the svg
@@ -11,7 +11,6 @@ var margin = {top: 20, right: 30, bottom: 40, left: 50},
     width = gwidth - margin.left - margin.right,
     height = gheight - margin.top - margin.bottom;
 
-//
 var fullDay=1000.0*86400;
 
 // in-plot gutters
@@ -22,11 +21,11 @@ var histoYGutter=1;
 var histogramXGap=0.14; // fraction of the full-bar-width to leave empty (sum of the sides)
 
 var historyXGutter=0.5*fullDay;
-var historyYGutter = 2;
+var historyYGutter = 8;
 var historyBarGap=0.14;
 
 // curves to plot
-var curves=[
+var countsCurveSets=[
   {
     "name": "abscount",
     "color": "black",
@@ -43,6 +42,34 @@ var curves=[
     "title": "People in"
   },
 ];
+// history bar series to plot
+historyBarSets=[
+  {
+    'name': 'max',
+    'color': 'black',
+    'index': 0,
+    'title': 'Max in'
+  },
+  {
+    'name': 'ins',
+    'color': 'cyan',
+    'index': 1,
+    'title': 'In hits'
+  },
+  {
+    'name': 'abscount',
+    'color': '#C0C0C0',
+    'index': 2,
+    'title': 'Hits'
+  },
+  {
+    'name': 'count',
+    'color': 'red',
+    'index': 3,
+    'title': 'Bias'
+  }
+];
+
 
 // UTILITY FUNCTIONS
 var formatTime=function(tstamp){
@@ -113,11 +140,12 @@ var chartBody = chart.append("g")
   .attr("id","chartBody")
   .attr("clip-path", "url(#clip)");
 
+// main function to issue the plot
 d3.json(reqUrl,function(error,data){
   if(error != undefined){
     displayMessage(chartBody,"An error occurred.");
   } else {
-
+    // general setup of canvas and axes
     var y = d3.scaleLinear()
       .range([0,height]);
     var x = d3.scaleTime()
@@ -127,10 +155,10 @@ d3.json(reqUrl,function(error,data){
     var yAxis = d3.axisLeft()
       .scale(y);
     var xaxis=chartBody.append("g")
-      .attr("class", "x axis")
+      // .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")");
     var yaxis=chartBody.append("g")
-      .attr("class", "y axis")
+      // .attr("class", "y axis")
       .attr("transform", "translate(0,0)");
 
     if (plotType == "History") {
@@ -138,50 +166,27 @@ d3.json(reqUrl,function(error,data){
       if (plotData.length<1) {
         displayMessage(chartBody,"No data to plot.")
       } else {
-        console.log(plotData);
         // a quadruplet of histo bars per each day
         addAxisLabels(chartBody,"Day","Counts");
         var time_min=d3.min(plotData.map( function(d){return d.jtimestamp;} ));
         var time_max=d3.max(plotData.map( function(d){return d.jtimestamp;} ));
         var time_extent=time_max-time_min;
         var y_max=d3.max(plotData.map(
-          function(d) {return d3.max([d.abscount,d.count,d.ins,d.max]);}
+          function(d) {return d3.max(
+            historyBarSets.map(function(bs) {return d[bs.name];} )
+          );}
         ));
         var y_min=d3.min(plotData.map(
-          function(d) {return d3.min([d.abscount,d.count,d.ins,d.max]);}
+          function(d) {return d3.min(
+            historyBarSets.map(function(bs) {return d[bs.name];} )
+          );}
         ));
-        var y_extent=(y_max-y_min);
-        y.domain([y_max,y_min]);
+
+        y.domain([y_max+historyYGutter,y_min-historyYGutter]);
         x.domain([time_min-historyXGutter-0.5*fullDay, time_max+historyXGutter+0.5*fullDay]);
         var barsWidth=(1-historyBarGap)*(x(time_max)-x(time_min))/(1.0*plotData.length-1.0);
         var barsLeftGap=(0.5*historyBarGap)*(x(time_extent)-x(0))/(1.0*plotData.length-1);
         //
-        histories=[
-          {
-            'name': 'max',
-            'color': 'black',
-            'index': 0,
-            'title': 'Max in'
-          },
-          {
-            'name': 'ins',
-            'color': 'cyan',
-            'index': 1,
-            'title': 'In hits'
-          },
-          {
-            'name': 'abscount',
-            'color': '#C0C0C0',
-            'index': 2,
-            'title': 'Hits'
-          },
-          {
-            'name': 'count',
-            'color': 'red',
-            'index': 3,
-            'title': 'Bias'
-          }
-        ];
         chartBody
           .append("g")
           .attr("transform","translate("+x(time_min-0.5*fullDay-historyXGutter)+","+(y(0)-0.5*zeroAxisHeight)+")")
@@ -190,21 +195,24 @@ d3.json(reqUrl,function(error,data){
           .attr("height",zeroAxisHeight)
           .attr("fill",zeroAxisColor);
         //
-        for (ihistory=0;ihistory<histories.length;ihistory++){
-          tHistory=histories[ihistory];
+        for (ihistory=0;ihistory<historyBarSets.length;ihistory++){
+          tHistory=historyBarSets[ihistory];
           histoMaxInSel=chartBody.selectAll("."+tHistory.name+" g").data(plotData);
           histoMaxInBars=histoMaxInSel
               .enter()
               .append("g")
               .attr("transform", function(d) {
-                return "translate("+(x(d.jtimestamp-0.5*fullDay)+(ihistory*barsWidth/4.0)+barsLeftGap)
-                  +","+(y(d[tHistory.name])-y(y_max))+")";
+                return "translate("
+                  +(x(d.jtimestamp-0.5*fullDay)+(ihistory*barsWidth/4.0)+barsLeftGap)
+                  +","
+                  +(d[tHistory.name]>0? (y(d[tHistory.name])-y(y_max+historyYGutter)) : y(0) )
+                  +")";
               } );
           histoMaxInBars.append("rect")
               // .attr("class","lineclass")
               .style("fill",tHistory.color)
               .attr("width",function(d) {return 0.25*barsWidth;})
-              .attr("height",function(d) { return y(0)-y(d[tHistory.name]); })
+              .attr("height",function(d) { return y(0)-y(Math.abs(d[tHistory.name])); })
               .attr("fill-opacity",0.66);
           histoMaxInBars.append("title")
               .text(function(d) { return  formatDate(d.jtimestamp) + ": "+tHistory.title+" " + d[tHistory.name]; });
@@ -302,12 +310,12 @@ d3.json(reqUrl,function(error,data){
         var time_max=d3.max(plotData.map( function(d){return d.jtimestamp+d.span;} ));
         var time_extent=time_max-time_min;
         // y max and min across curves
-        var y_min=d3.min(curves.map(function(cv) {
+        var y_min=d3.min(countsCurveSets.map(function(cv) {
           return d3.min(plotData.map(function(d){
             return d[cv.name]
           }));
         }));
-        var y_max=d3.max(curves.map(function(cv) {
+        var y_max=d3.max(countsCurveSets.map(function(cv) {
           return d3.max(plotData.map(function(d){
             return d[cv.name]
           }));
@@ -328,8 +336,8 @@ d3.json(reqUrl,function(error,data){
           .attr("height",zeroAxisHeight)
           .attr("fill",zeroAxisColor);
 
-        for(i=0; i<curves.length;i++){
-          var tCurve = curves[i];
+        for(i=0; i<countsCurveSets.length;i++){
+          var tCurve = countsCurveSets[i];
           crectasel=chartBody.selectAll("."+tCurve.name+" g").data(plotData);
           crectas=crectasel
               .enter()
