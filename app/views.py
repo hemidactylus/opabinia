@@ -178,7 +178,7 @@ def ep_history(daysback='7'):
         daysback=daysback,
         dateFormat=dateFormat,
         niceDateFormat=niceDateFormat,
-        reqDate=daysback,
+        daysBack=daysback,
         pagetype='History',
         reqUrl=reqUrl,
     )

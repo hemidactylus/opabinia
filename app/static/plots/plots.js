@@ -12,10 +12,11 @@ var margin = {top: 20, right: 30, bottom: 40, left: 50},
     height = gheight - margin.top - margin.bottom;
 
 var fullDay=1000.0*86400;
+var oneHour=1000.0*3600.0;
 
 // in-plot gutters
-var fpGutter=3600000; // space between plotted lines and plot area, horiz.
-var xGutter=180000;   // 
+var fpGutter=oneHour*0.15; // space between plotted lines and plot area, horiz.
+var xGutter=180000;   // gutter between plot area and canvas borders
 var lineYGutter=3;
 var histoYGutter=1;
 var histogramXGap=0.14; // fraction of the full-bar-width to leave empty (sum of the sides)

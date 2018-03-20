@@ -46,10 +46,10 @@ def localiseDate(dt):
     return locDate.astimezone(pytz.timezone(timeZone))
 
 def localiseRow(row):
-    nrow=row
+    nrow={k:v for k,v in row.items()}
     if nrow['time'] is not None:
         nrow['time']=localiseDate(row['time'])
-        nrow['jtimestamp']=time.mktime(nrow['time'].timetuple())*1000.0
+        nrow['jtimestamp']=time.mktime(localiseDate(row['time']).timetuple())*1000.0
     return nrow
 
 def jtimestampLatest(dpoints):
@@ -59,7 +59,7 @@ def jtimestampLatest(dpoints):
         (used for the data endpoint for plotting)
     '''
     latest=max(dpoints,key=lambda dp: dp['time'])['time']
-    locNow=localiseDate(datetime.now())
+    locNow=localiseDate(datetime.utcnow())
     if latest+timedelta(hours=1) > locNow:
         finalpoint=locNow
     else:

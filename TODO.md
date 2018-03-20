@@ -1,5 +1,7 @@
 # TODO
 
+Check the OS timezone.
+
 Plot:
   - css properly for all styles
   - Refactor the js in a decent way

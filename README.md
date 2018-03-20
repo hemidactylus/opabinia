@@ -104,6 +104,8 @@ The following operations are suggested:
     it is assumed the hostname `pimpa`
   - setting the 802.11b/g/n networking. Either through `raspi-config` or as explained in next
     paragraph
+  - setting the time zone for the OS to match the value found in `app/config.py` (to avoid
+    date/time mismatches in the on-page plots)
 
 As for the network configuration, assuming the WiFi USB dongle is plugged in and ackowledged
 by the RPi, add a block to the file `/etc/wpa_supplicant/wpa_supplicant.conf` similar to:

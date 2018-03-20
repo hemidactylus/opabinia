@@ -61,7 +61,11 @@
                 </a>
               </li>
               <li {% if pagetype=='History' %} class="active" {% endif %}>
-                <a href="{{ url_for('ep_history') }}">
+                {% if daysBack %}
+                  <a href="{{ url_for('ep_history', daysBack=daysBack) }}">
+                {% else %}
+                  <a href="{{ url_for('ep_history') }}">
+                {% endif %}
                   History
                 </a>
               </li>
