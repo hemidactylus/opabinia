@@ -126,6 +126,19 @@ var displayMessage = function(elem,msg) {
     .attr("transform","translate("+tx+","+ty+")");
 }
 
+// highlighting functions
+var makeGolden=function(tid){
+  d3.selectAll("g .c_"+tid)
+    .selectAll('rect')
+    .style('stroke','gold')
+    .style('stroke-width', 2);
+}
+var unMakeGolden=function(tid){
+  d3.selectAll("g .c_"+tid)
+    .selectAll('rect')
+    .style('stroke-width', 0);
+}
+
 // creation and resizing of the plot window
 var chart = d3.select(".chart")
   // these four are the only one on the actual SVG (outside of a viewbox)
@@ -302,7 +315,9 @@ d3.json(reqUrl,function(error,data){
         // we add a 'span' property to each point to measure its horiz-extent
         for(var i=0; i<plotData.length-1; i++){
           plotData[i].span=plotData[i+1].jtimestamp-plotData[i].jtimestamp;
+          plotData[i].jid=plotData[i].jtimestamp;
         }
+        plotData[plotData.length-1].jid=plotData[plotData.length-1].jtimestamp;
         if ((plotData[plotData.length-1].jtimestamp+fpGutter)>data.now) {
           plotData[plotData.length-1].span=data.now-plotData[plotData.length-1].jtimestamp;
         } else {
@@ -349,7 +364,7 @@ d3.json(reqUrl,function(error,data){
               .append("g")
               .attr("transform", function(d) {return "translate("+x(d.jtimestamp)
                 +","+(y(d[tCurve.name])-0.5*barHeight)+")"; } )
-              .attr("class",function(d){return "c_"+d.jtimestamp; });
+              .attr("class",function(d){return "c_"+d.jid; });
 
           crectas.append("rect")
               // .attr("class","lineclass")
@@ -360,21 +375,41 @@ d3.json(reqUrl,function(error,data){
           crectas.append("title")
               .text(function(d) { return  d[tCurve.name] + " ("+tCurve.title+") "
                                           + formatTimeInterval(d.jtimestamp,d.span); });
-
-          crectas.on('mouseenter',function(d){
-              d3.selectAll("g .c_"+d.jtimestamp)
-                  .selectAll('rect')
-                  .style('stroke','gold')
-                  .style('stroke-width', 2);
-          });
-          crectas.on('mouseleave',function(d){
-              d3.selectAll("g .c_"+d.jtimestamp)
-                  .selectAll('rect')
-                  .style('stroke-width', 0);
-          });
+          // on-element highlighting machine
+          crectas.on(
+            'mouseenter',
+            function(d){
+              makeGolden(d.jid);
+            }
+          );
+          crectas.on(
+            'mouseleave',
+            function(d){
+              unMakeGolden(d.jid);
+            }
+          );
         }
         xaxis.call(xAxis);
         yaxis.call(yAxis);
+
+        // on-list highlighting machine
+        for(id=0;id<plotData.length;id++){
+          jtimeID=plotData[id].jid;
+          d3.selectAll(".tr_"+jtimeID)
+            .on(
+              "mouseenter",
+              function(jtimeID){
+                 return function(){makeGolden(jtimeID)}
+              }(jtimeID)
+            );
+          d3.selectAll(".tr_"+jtimeID)
+            .on(
+              "mouseleave",
+              function(jtimeID){
+                 return function(){unMakeGolden(jtimeID)}
+              }(jtimeID)
+            );
+        }
 
       }
     }
