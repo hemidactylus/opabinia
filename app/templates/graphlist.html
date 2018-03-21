@@ -92,7 +92,7 @@
               <tbody>
               {% for ent in entries %}
                 {% if pagetype != 'Hits' %}
-                  <tr>
+                  <tr class="tr_{{'%i' % ent.jtimestamp}}">
                     <td>
                       {{ ent.time.strftime('%H:%M:%S') }}
                     </td>

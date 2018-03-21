@@ -44,7 +44,6 @@ from dateutils import (
     normaliseReqDate,
     monthNames,
     sortAndLocalise,
-    jtimestampLatest,
     roundTime,
     timeHistogram,
 )
@@ -95,7 +94,7 @@ def ep_datacounters(date='today'):
     return jsonify(
         {
             'points': dataPoints,
-            'now': jtimestampLatest(dataPoints),
+            'now': time.mktime(datetime.utcnow().timetuple())*1000.0,
         }
     )
 

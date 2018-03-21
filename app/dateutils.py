@@ -52,20 +52,6 @@ def localiseRow(row):
         nrow['jtimestamp']=time.mktime(localiseDate(row['time']).timetuple())*1000.0
     return nrow
 
-def jtimestampLatest(dpoints):
-    '''
-        returns a (java)timestamp for a date
-        safely beyond the provided one
-        (used for the data endpoint for plotting)
-    '''
-    latest=max(dpoints,key=lambda dp: dp['time'])['time']
-    locNow=localiseDate(datetime.utcnow())
-    if latest+timedelta(hours=1) > locNow:
-        finalpoint=locNow
-    else:
-        finalpoint=latest+timedelta(hours=1)
-    return time.mktime((finalpoint).timetuple())*1000.0
-
 def timeBounds(datename):
     '''
         given a datename, i.e.

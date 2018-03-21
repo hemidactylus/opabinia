@@ -303,7 +303,11 @@ d3.json(reqUrl,function(error,data){
         for(var i=0; i<plotData.length-1; i++){
           plotData[i].span=plotData[i+1].jtimestamp-plotData[i].jtimestamp;
         }
-        plotData[plotData.length-1].span=data.now-plotData[plotData.length-1].jtimestamp;
+        if ((plotData[plotData.length-1].jtimestamp+fpGutter)>data.now) {
+          plotData[plotData.length-1].span=data.now-plotData[plotData.length-1].jtimestamp;
+        } else {
+          plotData[plotData.length-1].span=fpGutter;
+        }
         plotData[0].jtimestamp=plotData[1].jtimestamp-fpGutter;
         plotData[0].span=fpGutter;
         // x axis max/min
@@ -344,16 +348,30 @@ d3.json(reqUrl,function(error,data){
               .enter()
               .append("g")
               .attr("transform", function(d) {return "translate("+x(d.jtimestamp)
-                +","+(y(d[tCurve.name])-0.5*barHeight)+")"; } );
+                +","+(y(d[tCurve.name])-0.5*barHeight)+")"; } )
+              .attr("class",function(d){return "c_"+d.jtimestamp; });
+
           crectas.append("rect")
               // .attr("class","lineclass")
               .style("fill",tCurve.color)
-              .attr("width",function(d) {return width*(d.span/time_extent);})
+              .attr("width",function(d) {return x(d.jtimestamp+d.span)-x(d.jtimestamp);})
               .attr("height",barHeight)
               .attr("fill-opacity",0.66);
           crectas.append("title")
               .text(function(d) { return  d[tCurve.name] + " ("+tCurve.title+") "
                                           + formatTimeInterval(d.jtimestamp,d.span); });
+
+          crectas.on('mouseenter',function(d){
+              d3.selectAll("g .c_"+d.jtimestamp)
+                  .selectAll('rect')
+                  .style('stroke','gold')
+                  .style('stroke-width', 2);
+          });
+          crectas.on('mouseleave',function(d){
+              d3.selectAll("g .c_"+d.jtimestamp)
+                  .selectAll('rect')
+                  .style('stroke-width', 0);
+          });
         }
         xaxis.call(xAxis);
         yaxis.call(yAxis);
