@@ -216,8 +216,8 @@ d3.json(reqUrl,function(error,data){
         // attach a quartet of bars for each provided day
         for (ihistory=0;ihistory<historyBarSets.length;ihistory++){
           tHistory=historyBarSets[ihistory];
-          histoMaxInSel=chartBody.selectAll("."+tHistory.name+" g").data(plotData);
-          histoMaxInBars=histoMaxInSel
+          histoBarSel=chartBody.selectAll("."+tHistory.name+" g").data(plotData);
+          histoBars=histoBarSel
               .enter()
               .append("g")
               .attr("transform", function(d) {
@@ -226,17 +226,51 @@ d3.json(reqUrl,function(error,data){
                   +","
                   +(d[tHistory.name]>0? (y(d[tHistory.name])-y(y_max+historyYGutter)) : y(0) )
                   +")";
-              } );
-          histoMaxInBars.append("rect")
+              } )
+              .attr("class",function(d){return "c_"+d.jtimestamp; });
+          histoBars.append("rect")
               // .attr("class","lineclass")
               .style("fill",tHistory.color)
               .attr("width",function(d) {return (x(singleBarWidth*fullDay)-x(0));})
               .attr("height",function(d) { return y(0)-y(Math.abs(d[tHistory.name])); })
               .attr("fill-opacity",0.66);
-          histoMaxInBars.append("title")
+          histoBars.append("title")
               .text(function(d) { return  formatDate(d.jtimestamp) + ": "+tHistory.title+" " + d[tHistory.name]; });
+
+          // on-element highlighting machine
+          histoBars.on(
+            'mouseenter',
+            function(d){
+              makeGolden(d.jtimestamp);
+            }
+          );
+          histoBars.on(
+            'mouseleave',
+            function(d){
+              unMakeGolden(d.jtimestamp);
+            }
+          );
         }
 
+        // on-list highlighting machine
+        for(id=0;id<plotData.length;id++){
+          jtimeID=plotData[id].jtimestamp;
+          d3.selectAll(".tr_"+jtimeID)
+            .on(
+              "mouseenter",
+              function(jtimeID){
+                 return function(){makeGolden(jtimeID)}
+              }(jtimeID)
+            );
+          d3.selectAll(".tr_"+jtimeID)
+            .on(
+              "mouseleave",
+              function(jtimeID){
+                 return function(){unMakeGolden(jtimeID)}
+              }(jtimeID)
+            );
+        }
+        
         xaxis.call(xAxis);
         yaxis.call(yAxis);
 

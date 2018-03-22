@@ -167,7 +167,7 @@ def ep_history(daysback='7'):
     #
     dates=dbGetDateList(db,startDate=firstDate)
     history={
-        d: integrateRows(db,d,cumulate=False)
+        d: jHistorizer(integrateRows(db,d,cumulate=False))
         for d in dates
     }
     return render_template(

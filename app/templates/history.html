@@ -79,7 +79,7 @@
               </thead>
               <tbody>
               {% for histdate,histitem in history.items() | sort(reverse=True) %}
-                <tr>
+                <tr class="tr_{{'%i' % histitem.jtimestamp}}">
                   <td>
                     <a href=" {{ url_for('ep_counters', date=histdate.strftime(dateFormat)) }} ">
                       {{ histdate.strftime(niceDateFormat) }}
