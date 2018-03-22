@@ -128,7 +128,7 @@
                     </td>
                   </tr>
                 {% else %}
-                  <tr>
+                  <tr class="tr_{{'%i' % ent.jtimestamp}}">
                     <td>
                       {{ ent.time.strftime('%H:%M:%S') }}
                     </td>

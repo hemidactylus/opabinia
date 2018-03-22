@@ -2,6 +2,7 @@
 var minBarHeight = 4; // min height of the plot line
 var zeroAxisHeight=2; // height of the line marking the zero axis
 var zeroAxisColor="#006000";
+var goldenBorderColor="gold"; // highlighted elements on the plot
 
 var gwidth=600;       // viewport size of the svg
 var gheight=330;      // (these must match the size on the html!)
@@ -130,7 +131,7 @@ var displayMessage = function(elem,msg) {
 var makeGolden=function(tid){
   d3.selectAll("g .c_"+tid)
     .selectAll('rect')
-    .style('stroke','gold')
+    .style('stroke',goldenBorderColor)
     .style('stroke-width', 2);
 }
 var unMakeGolden=function(tid){
@@ -198,9 +199,8 @@ d3.json(reqUrl,function(error,data){
 
         y.domain([y_max+historyYGutter,y_min-historyYGutter]);
         x.domain([time_min-historyXGutter-0.5*fullDay, time_max+historyXGutter+0.5*fullDay]);
-        var barsWidth=(1-historyBarGap)*(x(time_max)-x(time_min))/(1.0*plotData.length-1.0);
-        var barsLeftGap=(0.5*historyBarGap)*(x(time_extent)-x(0))/(1.0*plotData.length-1);
-        //
+
+        // y=0 axis
         chartBody
           .append("g")
           .attr("transform","translate("+x(time_min-0.5*fullDay-historyXGutter)+","+(y(0)-0.5*zeroAxisHeight)+")")
@@ -208,7 +208,12 @@ d3.json(reqUrl,function(error,data){
           .attr("width",x(time_max+0.5*fullDay+historyXGutter)-x(time_min-0.5*fullDay-historyXGutter))
           .attr("height",zeroAxisHeight)
           .attr("fill",zeroAxisColor);
-        //
+
+        // these are in units of one-day
+        var leftBarGutter=0.5*historyBarGap;
+        var singleBarWidth=0.25*(1-historyBarGap);
+
+        // attach a quartet of bars for each provided day
         for (ihistory=0;ihistory<historyBarSets.length;ihistory++){
           tHistory=historyBarSets[ihistory];
           histoMaxInSel=chartBody.selectAll("."+tHistory.name+" g").data(plotData);
@@ -217,7 +222,7 @@ d3.json(reqUrl,function(error,data){
               .append("g")
               .attr("transform", function(d) {
                 return "translate("
-                  +(x(d.jtimestamp-0.5*fullDay)+(ihistory*barsWidth/4.0)+barsLeftGap)
+                  +(x(d.jtimestamp+(-0.5+leftBarGutter+ihistory*singleBarWidth)*fullDay))
                   +","
                   +(d[tHistory.name]>0? (y(d[tHistory.name])-y(y_max+historyYGutter)) : y(0) )
                   +")";
@@ -225,7 +230,7 @@ d3.json(reqUrl,function(error,data){
           histoMaxInBars.append("rect")
               // .attr("class","lineclass")
               .style("fill",tHistory.color)
-              .attr("width",function(d) {return 0.25*barsWidth;})
+              .attr("width",function(d) {return (x(singleBarWidth*fullDay)-x(0));})
               .attr("height",function(d) { return y(0)-y(Math.abs(d[tHistory.name])); })
               .attr("fill-opacity",0.66);
           histoMaxInBars.append("title")
@@ -266,39 +271,87 @@ d3.json(reqUrl,function(error,data){
           .attr("height",zeroAxisHeight)
           .attr("fill",zeroAxisColor);
         // outs
-        cbarsel=chartBody.selectAll(".outs g").data(plotData);
-        cbars=cbarsel
+        cbarselOut=chartBody.selectAll(".outs g").data(plotData);
+        cbarsOut=cbarselOut
             .enter()
             .append("g")
             .attr("transform", function(d) {
               return "translate("+x(d.jtimestamp-(0.5-0.5*histogramXGap)*tSpan)
-                +","+y(0)+")";
-            } );
-        cbars.append("rect")
+                +","+y(0)+")"
+            } )
+            .attr("class",function(d){return "c_"+d.jtimestamp; });
+        cbarsOut.append("rect")
             // .attr("class","lineclass")
             .style("fill","red")
             .attr("width",function(d) {return width*((1-histogramXGap)*d.span/time_extent);})
             .attr("height",function(d) { return y(0)-y(d.outs); })
             .attr("fill-opacity",0.66);
-        cbars.append("title")
+        cbarsOut.append("title")
             .text(function(d) { return  formatTime(d.jtimestamp) + ": outflux " + d.outs; });
+        // on-element highlighting machine
+        cbarsOut.on(
+          'mouseenter',
+          function(d){
+            makeGolden(d.jtimestamp);
+          }
+        );
+        cbarsOut.on(
+          'mouseleave',
+          function(d){
+            unMakeGolden(d.jtimestamp);
+          }
+        );
+
         // ins
-        cbarsel=chartBody.selectAll(".ins g").data(plotData);
-        cbars=cbarsel
+        cbarselIn=chartBody.selectAll(".ins g").data(plotData);
+        cbarsIn=cbarselIn
             .enter()
             .append("g")
             .attr("transform", function(d) {
               return "translate("+x(d.jtimestamp-(0.5-0.5*histogramXGap)*tSpan)
                 +","+(y(d.ins)-y(abs_y_max+histoYGutter))+")";
-            } );
-        cbars.append("rect")
+            } )
+            .attr("class",function(d){return "c_"+d.jtimestamp; });
+        cbarsIn.append("rect")
             // .attr("class","lineclass")
             .style("fill","cyan")
             .attr("width",function(d) {return width*((1-histogramXGap)*d.span/time_extent);})
             .attr("height",function(d) { return y(0)-y(d.ins); })
             .attr("fill-opacity",0.66);
-        cbars.append("title")
+        cbarsIn.append("title")
             .text(function(d) { return  formatTime(d.jtimestamp) + ": influx " + d.ins; });
+        // on-element highlighting machine
+        cbarsIn.on(
+          'mouseenter',
+          function(d){
+            makeGolden(d.jtimestamp);
+          }
+        );
+        cbarsIn.on(
+          'mouseleave',
+          function(d){
+            unMakeGolden(d.jtimestamp);
+          }
+        );
+
+        // on-list highlighting machine
+        for(id=0;id<plotData.length;id++){
+          jtimeID=plotData[id].jtimestamp;
+          d3.selectAll(".tr_"+jtimeID)
+            .on(
+              "mouseenter",
+              function(jtimeID){
+                 return function(){makeGolden(jtimeID)}
+              }(jtimeID)
+            );
+          d3.selectAll(".tr_"+jtimeID)
+            .on(
+              "mouseleave",
+              function(jtimeID){
+                 return function(){unMakeGolden(jtimeID)}
+              }(jtimeID)
+            );
+        }
 
         xaxis.call(xAxis);
         yaxis.call(yAxis);
