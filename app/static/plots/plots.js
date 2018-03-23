@@ -368,6 +368,38 @@ d3.json(reqUrl,function(error,data){
           }
         );
 
+        // nets: a fixed-thickness line at a given height
+        cbarselNet=chartBody.selectAll(".ins g").data(plotData);
+        cbarsNet=cbarselNet
+            .enter()
+            .append("g")
+            .attr("transform", function(d) {
+              return "translate("+x(d.jtimestamp-(0.5-0.5*histogramXGap)*tSpan)
+                +","+(y(d.nets)-0.5*minBarHeight-y(abs_y_max+histoYGutter))+")";
+            } )
+            // .attr("class",function(d){return "c_"+d.jtimestamp; });
+        cbarsNet.append("rect")
+            // .attr("class","lineclass")
+            .style("fill","white")
+            .attr("width",function(d) {return width*((1-histogramXGap)*d.span/time_extent);})
+            .attr("height",function(d) { return minBarHeight; })
+            .attr("fill-opacity",0.66);
+        cbarsNet.append("title")
+            .text(function(d) { return  formatTime(d.jtimestamp) + ": net flux " + d.nets; });
+        // on-element highlighting machine
+        cbarsNet.on(
+          'mouseenter',
+          function(d){
+            makeGolden(d.jtimestamp);
+          }
+        );
+        cbarsNet.on(
+          'mouseleave',
+          function(d){
+            unMakeGolden(d.jtimestamp);
+          }
+        );
+
         // on-list highlighting machine
         for(id=0;id<plotData.length;id++){
           jtimeID=plotData[id].jtimestamp;

@@ -61,7 +61,7 @@
               <thead>
                 <tr>
                   {% if pagetype == 'Hits' %}
-                    <th class="col col-sm-6">
+                    <th class="col col-sm-3">
                       Time
                     </th>
                     <th class="col col-sm-3">
@@ -69,6 +69,9 @@
                     </th>
                     <th class="col col-sm-3">
                       Outflux
+                    </th>
+                    <th class="col col-sm-3">
+                      Net flux
                     </th>
                   {% else %}
                     <th class="col col-sm-3">
@@ -142,6 +145,20 @@
                       <span style="color: red;
                           {% if ent.outs > 0 %} font-weight: bold {% else %} font-size: 80% {% endif %};">
                         {{ ent.outs }}
+                      </span>
+                    </td>
+                    <td>
+                      <span 
+                          {% if ent.nets > 0 %}
+                            style="font-weight: bold; color: cyan;"
+                          {% else %}
+                            {% if ent.nets == 0 %}
+                              style="font-size: 80%; color: cyan;"
+                            {% else %}
+                              style="font-weight: bold; color: red;"
+                            {% endif %}
+                          {% endif %};">
+                        {{ ent.ins-ent.outs }}
                       </span>
                     </td>
                   </tr>

@@ -120,6 +120,8 @@ def sortAndLocalise(evtList,maxItems=maxNumCounterEntries):
             for e1,e2 in zip(fullList[:-1],fullList[1:])
             if (e2['time']-e1['time']).total_seconds() > spanThreshold
         ]
+    else:
+        finalList=fullList
     #
     return finalList
 
@@ -167,6 +169,7 @@ def timeHistogram(evtList,barSeconds):
                 'jtimestamp': time.mktime(tDate.timetuple())*1000.0,
                 'ins': 0,
                 'outs': 0,
+                'nets': 0,
                 'span': 1000.0*barSeconds,
             }
             for tDate in allDates
@@ -177,6 +180,8 @@ def timeHistogram(evtList,barSeconds):
                 histo[qDate]['ins']+=1
             elif evt['count']<0:
                 histo[qDate]['outs']+=1
+        for hItem in histo.values():
+            hItem['nets']=hItem['ins']-hItem['outs']
         return sorted(
             histo.values(),
             key=lambda hData: hData['time']
