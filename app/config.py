@@ -17,6 +17,9 @@ fileNameDateFormat='%Y_%m_%d_%H_%M_%S'
 
 # web app settings
 barSeconds=30*60 # for the histogram on 'Flux' page
+maxNumCounterEntries=500   # above this many counter
+                            # entries in one day, the
+                            # shortest-lived are pruned away cleanly
 
 # UI settings
 defaultHoursBack=8

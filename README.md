@@ -105,7 +105,8 @@ The following operations are suggested:
   - setting the 802.11b/g/n networking. Either through `raspi-config` or as explained in next
     paragraph
   - setting the time zone for the OS to match the value found in `app/config.py` (to avoid
-    date/time mismatches in the on-page plots)
+    date/time mismatches in the on-page plots). This is done
+    again with `raspi-config` (_Localisation options_, then _Change timezone_).
 
 As for the network configuration, assuming the WiFi USB dongle is plugged in and ackowledged
 by the RPi, add a block to the file `/etc/wpa_supplicant/wpa_supplicant.conf` similar to:
@@ -183,10 +184,11 @@ _Note_: these instructions for the system services assume systemd is the init da
 in other cases, similar instructions apply, see the note below for Wheezy.
 
 __Sensor configuration__: in most cases, the only settings that might require
-some tuning are the `timeZone` in `config.py`
+some tuning are: (1) the `timeZone` in `config.py`
 (refer to [`pytz`](https://pypi.python.org/pypi/pytz) for details on this)
-and the range of distances triggering a positive detection:
-the latter are set (in meters) by changing the two-element array `sensorDistanceRange`
+and, accordingly, at the OS level;
+(2) the range of distances triggering a positive detection:
+they are set (in meters) by changing the two-element array `sensorDistanceRange`
 in file `app/config.py` (after which `opacounter` shall be restarted).
 
 ### In case of Wheezy Raspbian

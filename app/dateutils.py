@@ -11,6 +11,7 @@ from config import (
     timeZone,
     dateFormat,
     niceDateFormat,
+    maxNumCounterEntries,
 )
 
 monthNames=[
@@ -86,8 +87,12 @@ def normaliseReqDate(rdate):
           return possibleName
     return rdate
 
-def sortAndLocalise(evtList):
-    return sorted(
+def sortAndLocalise(evtList,maxItems=maxNumCounterEntries):
+    '''
+        this also reduces, if necessary, the number of entries.
+        Pass maxItems = None to suppress this behaviour
+    '''
+    fullList=sorted(
         (
             localiseRow(evt)
             for evt in evtList
@@ -95,6 +100,28 @@ def sortAndLocalise(evtList):
         key=lambda evt: evt['time'],
         reverse=True,
     )
+    # OPTION 1 is to limit the returned to the LAST items
+    # if maxItems is not None:
+    #     finalList=fullList[:maxItems]
+    # else:
+    #     finalList=fullList
+    # OPTION 2 is to carefully remove the shortest-lived entries
+    if maxItems is not None and len(fullList)>maxItems:
+        # find the span threshold
+        spanThreshold=sorted(
+            (
+                (e2['time']-e1['time']).total_seconds()
+                for e1,e2 in zip(fullList[:-1],fullList[1:])
+            ),
+            reverse=True,
+        )[maxItems]
+        finalList=[
+            e1
+            for e1,e2 in zip(fullList[:-1],fullList[1:])
+            if (e2['time']-e1['time']).total_seconds() > spanThreshold
+        ]
+    #
+    return finalList
 
 
 def roundTime(dt, roundToSeconds):
