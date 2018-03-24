@@ -84,7 +84,7 @@ def getHistory(daysback):
     dates=dbGetDateList(db,startDate=firstDate)
     history=[
         jHistorizer(integrateRows(db,d,cumulate=False))
-        for d in sorted(dates)
+        for d in sorted(dates,reverse=True)
     ]
     return {
         'data': history,

@@ -129,34 +129,6 @@ def ep_history(daysback='7'):
 @app.route('/datahistory/<daysback>')
 def ep_datahistory(daysback='7'):
     return jsonify(getHistory(daysback))
-    # db=dbOpenDatabase(dbName)
-    # if daysback!='forever':
-    #     try:
-    #         dbackInt=int(daysback)
-    #         firstDate=findPreviousMidnight(datetime.utcnow())-timedelta(days=dbackInt-2)
-    #     except:
-    #         firstDate=None
-    # else:
-    #     firstDate=None
-    # dates=dbGetDateList(db,startDate=firstDate)
-    # history={
-    #     d: integrateRows(db,d,cumulate=False)
-    #     for d in dates
-    # }
-    # #
-    # jhistory=[
-    #     jHistorizer(itm)
-    #     for itm in sorted(
-    #         history.values(),
-    #         key=lambda hIt: hIt['date'],
-    #     )
-    # ]
-    # return jsonify(
-    #     {
-    #         'history': jhistory,
-    #         'now': time.mktime((datetime.now()).timetuple())*1000.0,
-    #     }
-    # )
 
 @app.route('/about')
 def ep_about():
@@ -197,20 +169,11 @@ def ep_download_history():
     db=dbOpenDatabase(dbName)
     now=localiseDate(datetime.utcnow())
     # 1. history
-    dates=dbGetDateList(db,startDate=None)
-    history={
-        d: integrateRows(db,d,cumulate=False)
-        for d in dates
-    }
+    history=getHistory(daysback=None)['data']
     # 2. daily detail
     dates=dbGetDateList(db)
     perDay={
-        tDate: sortAndLocalise(
-            integrateRows(
-                db,
-                datetime(*tDate.timetuple()[:3]),
-            )
-        )
+        tDate: getCounters(tDate.strftime(dateFormat))['data']
         for tDate in dates
     }
     #

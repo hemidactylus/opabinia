@@ -51,11 +51,12 @@ def makeSpreadsheet(history, perDay, now):
     hWorksheet.write(2,2,'In hits',wHeadingFormat)
     hWorksheet.write(2,3,'Hits',wHeadingFormat)
     hWorksheet.write(2,4,'Bias',wHeadingFormat)
-    for row,(hDay,hElem) in enumerate(sorted(
-        history.items(),
+    for row,hElem in enumerate(sorted(
+        history,
+        key=lambda itm: itm['date'],
         reverse=True,
     )):
-        hWorksheet.write(3+row,0,hDay,wDateFormat)
+        hWorksheet.write(3+row,0,hElem['date'],wDateFormat)
         hWorksheet.write(3+row,1,hElem['max'])
         hWorksheet.write(3+row,2,hElem['ins'])
         hWorksheet.write(3+row,3,hElem['abscount'])

@@ -177,7 +177,7 @@ d3.json(reqUrl,function(error,data){
       .attr("transform", "translate(0,0)");
 
     if (plotType == "History") {
-      plotData=data.data;
+      plotData=data.data.reverse();
       if (plotData.length<1) {
         displayMessage(chartBody,"No data to plot.")
       } else {
@@ -276,7 +276,7 @@ d3.json(reqUrl,function(error,data){
 
       }
   } else if (plotType == "Hits") {
-      var plotData=data.data;
+      var plotData=data.data.reverse();
       if (plotData.length<1) {
         displayMessage(chartBody,"No data to plot.");
       } else {
@@ -439,18 +439,7 @@ d3.json(reqUrl,function(error,data){
         // last item's span is calculated differently
         var lastItemEnd=plotData[plotData.length-1].jtimestamp+fpGutter;
         plotData[plotData.length-1].span=d3.min([data.now,lastItemEnd]) - plotData[plotData.length-1].jtimestamp;
-        console.log('lastSpan '+plotData[plotData.length-1].span);
-        // //
-        // console.log('L = ' + (plotData[plotData.length-1].jtimestamp+fpGutter));
-        // console.log('N = ' + (data.now));
-        // if ((plotData[plotData.length-1].jtimestamp+fpGutter)>data.now) {
-        //   console.log('* LSd: '+(data.now-plotData[plotData.length-1].jtimestamp));
-        //   plotData[plotData.length-1].span=data.now-plotData[plotData.length-1].jtimestamp;
-        // } else {
-        //   console.log('* LSg: '+(fpGutter));
-        //   plotData[plotData.length-1].span=fpGutter;
-        // }
-        // console.log('L+sp = ' + (plotData[plotData.length-1].span+plotData[plotData.length-1].jtimestamp));
+        // first item is also treated a bit differently
         plotData[0].jtimestamp=plotData[1].jtimestamp-fpGutter;
         plotData[0].span=fpGutter;
         // x axis max/min

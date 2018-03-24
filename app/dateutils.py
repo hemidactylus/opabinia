@@ -4,7 +4,7 @@
 '''
 
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import time
 
 from config import (
@@ -64,7 +64,7 @@ def timeBounds(datename):
         as utc datetimes
     '''
     if datename=='today':
-        reqDate=datetime(*localiseDate(datetime.utcnow()).date().timetuple()[:3]) #datetime.utcnow()
+        reqDate=datetime(*localiseDate(datetime.utcnow()).date().timetuple()[:3])
     elif datename=='yesterday':
         reqDate=datetime(*localiseDate(datetime.utcnow()-timedelta(days=1)).date().timetuple()[:3])
     else:
@@ -72,7 +72,6 @@ def timeBounds(datename):
             reqDate=datetime.strptime(datename,dateFormat)
         except:
             reqDate=datetime.utcnow()
-    #
     lastMidnight=findPreviousMidnight(reqDate)
     return reqDate,lastMidnight
 
@@ -184,5 +183,6 @@ def timeHistogram(evtList,barSeconds):
             hItem['nets']=hItem['ins']-hItem['outs']
         return sorted(
             histo.values(),
-            key=lambda hData: hData['time']
+            key=lambda hData: hData['time'],
+            reverse=True,
         )
