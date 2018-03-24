@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12" style="text-align: center; font-size: 180%;">
+          <h2>
+            <img src="/static/images/opabinia.png" height="60px">
+            Opabinia - {{ data.date.strftime(niceDateFormat) }}
+          </h2>
+        </div>
+      </div>
+
+      <div class="row" style="font-size: 180%;">
+        <div class="col-sm-12">
+          <div class="row">
+            <div class="col-md-3 col-sm-3">
+              People in:
+              <span 
+                  {% if data.count > 0 %}
+                    style="font-weight: bold; color: cyan;"
+                  {% else %}
+                    {% if data.count == 0 %}
+                      style="font-weight: bold;"
+                    {% else %}
+                      style="font-weight: bold; color: red;"
+                    {% endif %}
+                  {% endif %};">
+                {{ data.count }}
+              </span>
+            </div>
+            <div class="col-md-3 col-sm-3">
+              In hits:
+              <span style="font-weight: bold;">
+                {{ data.ins }}
+              </span>
+            </div>
+            <div class="col-md-3 col-sm-3">
+              Hits:
+              <span style="font-weight: bold;">
+                {{ data.abscount }}
+              </span>
+            </div>
+            <div class="col-md-3 col-sm-3">
+              Max in:
+              <span style="font-weight: bold;">
+                {{ data.max }}
+              </span>
+            </div>
+          </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" style="text-align: center; margin-top: 20px; margin-bottom: 10px;">
+          <span style="font-size: 60%; font-style: italic;">
+            (refreshed: {{ now.strftime('%H:%M:%S') }})
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    {% block footer %}
+        {{ super() }}
+    {% endblock %}
+
+{% endblock %}
+

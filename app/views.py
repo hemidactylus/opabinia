@@ -49,6 +49,7 @@ from api import (
     getEvents,
     getCounters,
     getHistory,
+    getCurrentStatus,
 )
 
 from dictutils import makeDateListToTree
@@ -56,6 +57,20 @@ from dictutils import makeDateListToTree
 from spreadsheets import makeSpreadsheet
 
 @app.route('/')
+@app.route('/index')
+def ep_index():
+    dNow=datetime.now()
+    curStatus=getCurrentStatus(dNow)
+    print(curStatus)
+    #
+    return render_template(
+        "index.html",
+        data=curStatus,
+        niceDateFormat=niceDateFormat,
+        now=dNow,
+        pagetype='Index',
+    )
+
 @app.route('/counters')
 @app.route('/counters/<date>')
 def ep_counters(date='today'):

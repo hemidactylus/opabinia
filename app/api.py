@@ -90,3 +90,8 @@ def getHistory(daysback):
         'data': history,
         'now': time.mktime((datetime.now()).timetuple())*1000.0,
     }
+
+def getCurrentStatus(now):
+    db=dbOpenDatabase(dbName)
+    curStatus=integrateRows(db,now.date(),cumulate=False)
+    return curStatus

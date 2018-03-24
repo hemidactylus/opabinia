@@ -41,13 +41,18 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
+              <li {% if pagetype=='Index' %} class="active" {% endif %}>
+                <a href="{{ url_for('ep_index') }}">
+                  <img class=".img-responsive" src="/static/images/icon.png" alt="Logo" height="25px">
+                  Home
+                </a>
+              </li>
               <li {% if pagetype=='Counts' %} class="active" {% endif %}>
                 {% if reqDate %}
                   <a href="{{ url_for('ep_counters',date=reqDate) }}">
                 {% else %}
                   <a href="{{ url_for('ep_counters') }}">
                 {% endif %}
-                  <img class=".img-responsive" src="/static/images/icon.png" alt="Logo" height="25px">
                   Counts
                 </a>
               </li>

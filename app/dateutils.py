@@ -105,25 +105,25 @@ def sortAndLocalise(evtList,maxItems=maxNumCounterEntries):
     # else:
     #     finalList=fullList
     # OPTION 2 is to carefully remove the shortest-lived entries
+    # (but the most recent, i.e. element zero, always survives!)
     if maxItems is not None and len(fullList)>maxItems:
         # find the span threshold
         spanThreshold=sorted(
             (
                 (e2['time']-e1['time']).total_seconds()
-                for e1,e2 in zip(fullList[:-1],fullList[1:])
+                for e1,e2 in zip(fullList[1:-1],fullList[2:])
             ),
             reverse=True,
-        )[maxItems]
-        finalList=[
+        )[maxItems-1]
+        finalList=[fullList[0]]+[
             e1
-            for e1,e2 in zip(fullList[:-1],fullList[1:])
+            for e1,e2 in zip(fullList[1:-1],fullList[2:])
             if (e2['time']-e1['time']).total_seconds() > spanThreshold
         ]
     else:
         finalList=fullList
     #
     return finalList
-
 
 def roundTime(dt, roundToSeconds):
    """
