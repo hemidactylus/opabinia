@@ -15,18 +15,23 @@ to keep an eye on the counts.
 
 ### Required material
 
-Opabinia is made with the following hardware (CHECK DETAILS):
+Opabinia is made with the following hardware:
   - a Raspberry Pi 2 B Quad Core CPU 900 MHz, 1 GB RAM
   - a RPi case for aesthetics (_optional_)
   - a microSD card with at least 4 GB space
   - an 802.11g/b/n USB dongle (_for WiFi connectivity_)
   - two proximity sensors of type HC-SR04
   - five LEDs
-  - resistors: 5 x 2.2k, 2 x 4.7k, 2 x 3.3k
-  - wiring
+  - resistors: 5 x 220 Ohm, 2 x 470 Ohm, 2 x 330 Ohm
+  - solid-core wiring (AWG 22, ideally)
+  - eight female-female dupont cables (to connect the sensors to the board)
+  - breakout pins (8x1 male, 20x2 female)
   - some kind of breadboard, e.g. a 8 x 12cm double side prototype pcb breadboard
 
 ### Schematics
+
+_Note_: there is a [dedicated page](Doc/circuit.md) about fitting the schematics into
+an actual layout.
 
 The circuit layout is as follows:
 
