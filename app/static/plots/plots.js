@@ -177,7 +177,7 @@ d3.json(reqUrl,function(error,data){
       .attr("transform", "translate(0,0)");
 
     if (plotType == "History") {
-      plotData=data.history;
+      plotData=data.data;
       if (plotData.length<1) {
         displayMessage(chartBody,"No data to plot.")
       } else {
@@ -276,8 +276,7 @@ d3.json(reqUrl,function(error,data){
 
       }
   } else if (plotType == "Hits") {
-      var plotData=data.histogram;
-      console.log(plotData);
+      var plotData=data.data;
       if (plotData.length<1) {
         displayMessage(chartBody,"No data to plot.");
       } else {
@@ -424,11 +423,11 @@ d3.json(reqUrl,function(error,data){
 
       }
     } else { // plotType == 'Counts'
-      if (data.points.length<2) {
+      if (data.data.length<2) {
         displayMessage(chartBody,"No data to plot.");
       } else {
         // restrict the range to the time of interest (depends on data!)
-        var plotData=data.points.reverse()
+        var plotData=data.data.reverse()
         addAxisLabels(chartBody,"Time","Counts");
 
         // we add a 'span' property to each point to measure its horiz-extent

@@ -93,7 +93,7 @@
                 </tr>
               </thead>
               <tbody>
-              {% for ent in entries %}
+              {% for ent in entries['data'] %}
                 {% if pagetype != 'Hits' %}
                   <tr class="tr_{{'%i' % ent.jtimestamp}}">
                     <td>

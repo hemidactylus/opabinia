@@ -54,6 +54,6 @@ sensorThresholdFactor=0.3
 ledPins={
     'baseline': [21],       # baseline, operation (green) - only one
     # these are [R, L] in the same way as the sensorPins above
-    'signal':   [20, 26],   # instantaneous measurement (yellow)
-    'detect':   [16, 19],   # debounced status (red)
+    'signal':   [20, 19],   # instantaneous measurement (yellow)
+    'detect':   [16, 26],   # debounced status (red)
 }

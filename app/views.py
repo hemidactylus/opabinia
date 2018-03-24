@@ -28,11 +28,8 @@ from app.config import (
 )
 
 from app.dboperations import (
-    checkAndOpenDatabase,
     dbOpenDatabase,
     dbGetRows,
-    dbSaveRow,
-    integrateRows,
     dbGetDateList,
 )
 
@@ -48,6 +45,12 @@ from dateutils import (
     timeHistogram,
 )
 
+from api import (
+    getEvents,
+    getCounters,
+    getHistory,
+)
+
 from dictutils import makeDateListToTree
 
 from spreadsheets import makeSpreadsheet
@@ -56,19 +59,13 @@ from spreadsheets import makeSpreadsheet
 @app.route('/counters')
 @app.route('/counters/<date>')
 def ep_counters(date='today'):
-    db=dbOpenDatabase(dbName)
-    queryDate,lastMidnight=timeBounds(date)
-    entries=sortAndLocalise(
-        integrateRows(
-            db,
-            queryDate,
-        )
-    )
+    entries=getCounters(date)
     reqDate=normaliseReqDate(date)
     reqUrl=url_for('ep_datacounters',date=reqDate)
+    queryDate,lastMidnight=timeBounds(date)
     return render_template(
       "graphlist.html",
-      text='Entries: %i' % (len(entries)),
+      text='Entries: %i' % (len(entries['data'])),
       pagetype='Counts',
       pagetitle='Counts',
       baseurl=url_for('ep_counters'),
@@ -83,33 +80,13 @@ def ep_counters(date='today'):
 @app.route('/datacounters')
 @app.route('/datacounters/<date>')
 def ep_datacounters(date='today'):
-    db=dbOpenDatabase(dbName)
-    queryDate,lastMidnight=timeBounds(date)
-    dataPoints=sortAndLocalise(
-        integrateRows(
-            db,
-            queryDate,
-        )
-    )
-    return jsonify(
-        {
-            'points': dataPoints,
-            'now': time.mktime(datetime.utcnow().timetuple())*1000.0,
-        }
-    )
+    return jsonify(getCounters(date))
 
 @app.route('/events')
 @app.route('/events/<date>')
 def ep_events(date='today'):
-    db=dbOpenDatabase(dbName)
     queryDate,lastMidnight=timeBounds(date)
-    entries=sortAndLocalise(
-        dbGetRows(
-            db,
-            queryDate
-        )
-    )
-    histo=timeHistogram(entries,barSeconds=barSeconds)
+    histo=getEvents(date)
     reqDate=normaliseReqDate(date)
     reqUrl=url_for('ep_dataevents',date=reqDate)
     return render_template(
@@ -129,47 +106,13 @@ def ep_events(date='today'):
 @app.route('/dataevents')
 @app.route('/dataevents/<date>')
 def ep_dataevents(date='today'):
-    db=dbOpenDatabase(dbName)
-    queryDate,lastMidnight=timeBounds(date)
-    entries=sortAndLocalise(
-        dbGetRows(
-            db,
-            queryDate
-        )
-    )
-    histo=timeHistogram(entries,barSeconds=barSeconds)
-    return jsonify(
-        {
-            'histogram': histo,
-            'now': time.mktime((datetime.now()).timetuple())*1000.0,
-        }
-    )
+    return jsonify(getEvents(date))
 
 @app.route('/history')
 @app.route('/history/<daysback>')
 def ep_history(daysback='7'):
-    db=dbOpenDatabase(dbName)
-    #
-    if daysback!='forever':
-        try:
-            dbackInt=int(daysback)
-            # to seek up to n days in the past,
-            # we go back n-2 days: one because of the ">=" in the query,
-            # one ... well I admit I have no idea but it seems to work. Damn trial-and-error,
-            # damn dates.
-            firstDate=findPreviousMidnight(datetime.utcnow())-timedelta(days=dbackInt-2)
-        except:
-            firstDate=None
-    else:
-        firstDate=None
-    #
+    history=getHistory(daysback)
     reqUrl=url_for('ep_datahistory',daysback=daysback)
-    #
-    dates=dbGetDateList(db,startDate=firstDate)
-    history={
-        d: jHistorizer(integrateRows(db,d,cumulate=False))
-        for d in dates
-    }
     return render_template(
         'history.html',
         pagetitle='History',
@@ -182,45 +125,38 @@ def ep_history(daysback='7'):
         reqUrl=reqUrl,
     )
 
-def jHistorizer(hItem):
-    nDict={
-        k: hItem[k]
-        for k in ['count','ins','abscount','max']
-    }
-    nDict['jtimestamp']=time.mktime(hItem['date'].timetuple())*1000.0
-    return nDict
-
 @app.route('/datahistory')
 @app.route('/datahistory/<daysback>')
 def ep_datahistory(daysback='7'):
-    db=dbOpenDatabase(dbName)
-    if daysback!='forever':
-        try:
-            dbackInt=int(daysback)
-            firstDate=findPreviousMidnight(datetime.utcnow())-timedelta(days=dbackInt-2)
-        except:
-            firstDate=None
-    else:
-        firstDate=None
-    dates=dbGetDateList(db,startDate=firstDate)
-    history={
-        d: integrateRows(db,d,cumulate=False)
-        for d in dates
-    }
-    #
-    jhistory=[
-        jHistorizer(itm)
-        for itm in sorted(
-            history.values(),
-            key=lambda hIt: hIt['date'],
-        )
-    ]
-    return jsonify(
-        {
-            'history': jhistory,
-            'now': time.mktime((datetime.now()).timetuple())*1000.0,
-        }
-    )
+    return jsonify(getHistory(daysback))
+    # db=dbOpenDatabase(dbName)
+    # if daysback!='forever':
+    #     try:
+    #         dbackInt=int(daysback)
+    #         firstDate=findPreviousMidnight(datetime.utcnow())-timedelta(days=dbackInt-2)
+    #     except:
+    #         firstDate=None
+    # else:
+    #     firstDate=None
+    # dates=dbGetDateList(db,startDate=firstDate)
+    # history={
+    #     d: integrateRows(db,d,cumulate=False)
+    #     for d in dates
+    # }
+    # #
+    # jhistory=[
+    #     jHistorizer(itm)
+    #     for itm in sorted(
+    #         history.values(),
+    #         key=lambda hIt: hIt['date'],
+    #     )
+    # ]
+    # return jsonify(
+    #     {
+    #         'history': jhistory,
+    #         'now': time.mktime((datetime.now()).timetuple())*1000.0,
+    #     }
+    # )
 
 @app.route('/about')
 def ep_about():
