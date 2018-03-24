@@ -3,7 +3,7 @@
 '''
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.config import (
     dbName,
@@ -14,6 +14,7 @@ from dateutils import (
     timeBounds,
     sortAndLocalise,
     timeHistogram,
+    findPreviousMidnight,
 )
 
 from app.dboperations import (
@@ -24,6 +25,7 @@ from app.dboperations import (
     integrateRows,
     dbGetDateList,
 )
+
 
 def getEvents(date):
     '''
@@ -55,7 +57,7 @@ def getCounters(date):
     )
     return {
         'data': dataPoints,
-        'now': time.mktime(datetime.utcnow().timetuple())*1000.0,
+        'now': time.mktime(datetime.now().timetuple())*1000.0,
     }
 
 def jHistorizer(hItem):
