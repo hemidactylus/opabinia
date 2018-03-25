@@ -1,0 +1,63 @@
+.hitsbar {
+  fill: black;
+}
+.insbar {
+  fill: red;
+}
+.countsbar {
+  fill: cyan;
+}
+
+.maxinhisto {
+  fill: black;
+}
+.inhisto {
+  fill: cyan;
+}
+.abscounthisto {
+  fill: #C0C0C0;
+}
+.counthisto {
+  fill: red;
+}
+
+.outhits {
+  fill: red;
+}
+.inhits {
+  fill: cyan;
+}
+.nethits {
+  fill: white;
+}
+
+.zeroaxis {
+  fill: #006000;
+}
+
+.golden {
+  stroke: gold;
+  stroke-width: 2;
+}
+
+.plotrecta {
+  fill-opacity: 0.66;
+}
+
+.chartbox {
+  background-color: #707070;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+.axis text{
+    fill: black;
+}
+.axis .axislabel {
+    fill: black;
+    font: 14pt sans-serif;
+}
