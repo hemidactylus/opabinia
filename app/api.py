@@ -15,6 +15,7 @@ from dateutils import (
     sortAndLocalise,
     timeHistogram,
     findPreviousMidnight,
+    javaTimestamp,
 )
 
 from app.dboperations import (
@@ -25,7 +26,6 @@ from app.dboperations import (
     integrateRows,
     dbGetDateList,
 )
-
 
 def getEvents(date):
     '''
@@ -42,7 +42,7 @@ def getEvents(date):
     histo=timeHistogram(entries,barSeconds=barSeconds)
     return {
         'data': histo,
-        'now': time.mktime((datetime.now()).timetuple())*1000.0,
+        'now': javaTimestamp(datetime.now()),
     }
 
 
@@ -57,7 +57,7 @@ def getCounters(date):
     )
     return {
         'data': dataPoints,
-        'now': time.mktime(datetime.now().timetuple())*1000.0,
+        'now': javaTimestamp(datetime.now()),
     }
 
 def jHistorizer(hItem):
@@ -68,7 +68,7 @@ def jHistorizer(hItem):
         k: hItem[k]
         for k in hItem.keys()#['count','ins','abscount','max']
     }
-    nDict['jtimestamp']=time.mktime(hItem['date'].timetuple())*1000.0
+    nDict['jtimestamp']=javaTimestamp(hItem['date'])
     return nDict
 
 def getHistory(daysback):
@@ -88,7 +88,7 @@ def getHistory(daysback):
     ]
     return {
         'data': history,
-        'now': time.mktime((datetime.now()).timetuple())*1000.0,
+        'now': javaTimestamp(datetime.now()),
     }
 
 def getCurrentStatus(now):

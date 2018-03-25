@@ -46,11 +46,14 @@ def localiseDate(dt):
     locDate=pytz.utc.localize(dt,is_dst=None)
     return locDate.astimezone(pytz.timezone(timeZone))
 
+def javaTimestamp(pDate):
+    return time.mktime(pDate.timetuple())*1000.0
+
 def localiseRow(row):
     nrow={k:v for k,v in row.items()}
     if nrow['time'] is not None:
         nrow['time']=localiseDate(row['time'])
-        nrow['jtimestamp']=time.mktime(localiseDate(row['time']).timetuple())*1000.0
+        nrow['jtimestamp']=javaTimestamp(nrow['time'])
     return nrow
 
 def timeBounds(datename):
@@ -165,7 +168,7 @@ def timeHistogram(evtList,barSeconds):
         histo={
             tDate : {
                 'time': tDate,
-                'jtimestamp': time.mktime(tDate.timetuple())*1000.0,
+                'jtimestamp': javaTimestamp(tDate),
                 'ins': 0,
                 'outs': 0,
                 'nets': 0,
