@@ -21,11 +21,6 @@ maxNumCounterEntries=500   # above this many counter
                             # entries in one day, the
                             # shortest-lived are pruned away cleanly
 
-# UI settings
-defaultHoursBack=8
-recentnessTimeSpan=timedelta(hours=defaultHoursBack)
-maxRecentItems=None # None=no cuts applied
-
 # sensor setup
 #    (Right=0 and Left=1 sensor pin setup.
 #     L/R refer to someone looking at the sensors).
@@ -40,12 +35,12 @@ sensorPins=[
     },
 ]
 # which way is 'entering' (i.e. +1)?
-innerSensor=0 # i.e. the R one is the one closer to 'in'
+innerSensor=1 # i.e. the R one is the one closer to 'in'
 # sensor response setup
 sensorReadFrequency=0.002           # seconds
-sensorDistanceRange=[0.10,0.90]     # meters: min/max
+sensorDistanceRange=[0.20,2.00]     # meters: min/max
 sensorDebounceTime=0.05             # seconds
-sensorRefractoryTime=2.0            # seconds
+sensorRefractoryTime=1.0            # seconds
 sensorPassageWindow=[0.1,0.8]       # seconds
 # expwindow sensor settings
 sensorDampRate=0.6
