@@ -37,14 +37,14 @@ sensorPins=[
 # which way is 'entering' (i.e. +1)?
 innerSensor=1 # i.e. the R one is the one closer to 'in'
 # sensor response setup
-sensorReadFrequency=0.008           # seconds
-sensorDistanceRange=[0.30,1.80]     # meters: min/max
-sensorDebounceTime=0.05             # seconds
-sensorRefractoryTime=1.0            # seconds
-sensorPassageWindow=[0.1,0.8]       # seconds
+sensorReadFrequency=0.002           # seconds
+sensorDistanceRange=[0.25,0.95]     # meters: min/max
+sensorDebounceTime=0.02             # seconds
+sensorRefractoryTime=0.5            # seconds
+sensorPassageWindow=[0.025,0.6]     # seconds
 # expwindow sensor settings
-sensorDampRate=0.6
-sensorThresholdFactor=0.3
+sensorDampRate=0.8
+sensorThresholdFactor=0.2
 # status-signaling LEDs
 ledPins={
     'baseline': [21],       # baseline, operation (green) - only one
