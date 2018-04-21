@@ -18,7 +18,7 @@ from config import (
     innerSensor,
     #
     sensorReadFrequency,
-    sensorDistanceRange,
+    sensorDistanceRanges,
     sensorDebounceTime,
     sensorRefractoryTime,
     sensorPassageWindow,
@@ -57,7 +57,10 @@ if __name__=='__main__':
             avgDampRate=sensorDampRate,
             avgThresholdFactor=sensorThresholdFactor,
         )
-        for distancer in distancers
+        for distancer,sensorDistanceRange in zip(
+            distancers,
+            sensorDistanceRanges,
+        )
     ]
 
     # led setup

@@ -22,25 +22,28 @@ maxNumCounterEntries=500   # above this many counter
                             # shortest-lived are pruned away cleanly
 
 # sensor setup
-#    (Right=0 and Left=1 sensor pin setup.
+#    (Left=0 and Right=1 sensor pin setup.
 #     L/R refer to someone looking at the sensors).
 sensorPins=[
-    {
-        'trigger': 18,
-        'echo':    24,
-    },
     {
         'trigger': 12,
         'echo':    25,
     },
+    {
+        'trigger': 18,
+        'echo':    24,
+    },
 ]
 # which way is 'entering' (i.e. +1)?
-innerSensor=1 # i.e. the R one is the one closer to 'in'
+innerSensor=0 # i.e. the L one is the one closer to 'in'
 # sensor response setup
 sensorReadFrequency=0.002           # seconds
-sensorDistanceRange=[0.25,0.95]     # meters: min/max
+sensorDistanceRanges=[              # meters: min/max, per sensor
+    [0.25,0.95],
+    [0.25,0.95],
+]
 sensorDebounceTime=0.02             # seconds
-sensorRefractoryTime=0.5            # seconds
+sensorRefractoryTime=0.1            # seconds
 sensorPassageWindow=[0.025,0.6]     # seconds
 # expwindow sensor settings
 sensorDampRate=0.8
@@ -49,6 +52,6 @@ sensorThresholdFactor=0.2
 ledPins={
     'baseline': [21],       # baseline, operation (green) - only one
     # these are [R, L] in the same way as the sensorPins above
-    'signal':   [20, 19],   # instantaneous measurement (yellow)
-    'detect':   [16, 26],   # debounced status (red)
+    'signal':   [19, 20],   # instantaneous measurement (yellow)
+    'detect':   [26, 16],   # debounced status (red)
 }
