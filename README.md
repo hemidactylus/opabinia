@@ -1,7 +1,7 @@
 # Opabinia
 
 A system to count people entering/exiting a room,
-made with a Raspberry Pi, a proximity sensor, some software and lots of love.
+made with a Raspberry Pi, a couple of proximity sensors, some software and lots of love.
 
 ## Overview
 
@@ -27,6 +27,9 @@ Opabinia is made with the following hardware:
   - eight female-female dupont cables (to connect the sensors to the board)
   - breakout pins (8x1 male, 20x2 female)
   - some kind of breadboard, e.g. a 8 x 12cm double side prototype pcb breadboard
+  - holders to keep the two sensors in place, e.g. a soldering helping hand is a good solution (as pictured below)
+
+<img src="Doc/photos/installed.jpg" alt="Installed Opabinia" width="90%"/>
 
 ### Schematics
 
